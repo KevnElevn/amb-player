@@ -1,0 +1,24 @@
+{
+  "name": "ambience-gen",
+  "version": "1.0.0",
+  "description": "Web app to arrange sounds to create ambient pieces",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha server/tests/api-tests.js",
+    "start": "node server/index.js",
+    "build": "cd client && npm install --production && npm run build"
+  },
+  "engines": {
+    "node": "16.14.0"
+  },
+  "author": "Kevin Li",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.0.0"
+  }
+}
