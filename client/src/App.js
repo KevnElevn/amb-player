@@ -12,17 +12,18 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import SearchPage from "./routes/search-page";
 import BrowsePage from "./routes/browse-page";
+import AmbPage from "./routes/amb-page";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: true,
+      isLoggedIn: true,
     };
   }
 
   renderMyAmb() {
-    if(this.state.loggedIn) {
+    if(this.state.isLoggedIn) {
       return(
         <Nav.Item>
             <Nav.Link as={NavLink} to="/myambs">My Ambs</Nav.Link>
@@ -51,13 +52,17 @@ class App extends React.Component {
               <Nav.Item>
                   <Nav.Link as={NavLink} to="/search">Search</Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={NavLink} to="/amb/1">Amb</Nav.Link>
+              </Nav.Item>
             </Nav>
           </Navbar>
           <Outlet />
         </div>
         <Routes>
-          <Route path="search" element={<SearchPage loggedIn={this.state.loggedIn} />} />
-          <Route path="browse" element={<BrowsePage loggedIn={this.state.loggedIn} />} />
+          <Route path="search" element={<SearchPage isLoggedIn={this.state.isLoggedIn} />} />
+          <Route path="browse" element={<BrowsePage isLoggedIn={this.state.isLoggedIn} />} />
+          <Route path="amb/:ambId" element={<AmbPage isLoggedIn={this.state.isLoggedIn} />} />
           <Route path="*" element={<main style={{ padding:"1rem"}}><p>There's nothing here!</p></main>} />
         </Routes>
 
