@@ -24,7 +24,8 @@ class AmbPage extends React.Component {
               <Accordion.Header>{element.groupName}</Accordion.Header>
               <Accordion.Body>
                 <SoundGroup
-                  key={index}
+                  key={`${this.props.ambId}+${element.groupId}`}
+                  id={`${this.props.ambId}+${element.groupId}`}
                   groupName={element.groupName}
                   sounds={element.sounds}
                   isPlaying={this.state.isPlaying}
