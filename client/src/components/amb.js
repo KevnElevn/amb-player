@@ -20,18 +20,14 @@ class AmbPage extends React.Component {
       this.props.soundGroups.map((element, index) => {
         return (
           <Accordion>
-            <Accordion.Item eventKey={index}>
-              <Accordion.Header>{element.groupName}</Accordion.Header>
-              <Accordion.Body>
-                <SoundGroup
-                  key={`${this.props.ambId}+${element.groupId}`}
-                  id={`${this.props.ambId}+${element.groupId}`}
-                  groupName={element.groupName}
-                  sounds={element.sounds}
-                  isPlaying={this.state.isPlaying}
-                />
-              </Accordion.Body>
-            </Accordion.Item>
+            <SoundGroup
+              key={`${this.props.ambId}+${element.groupId}`}
+              id={`${this.props.ambId}+${element.groupId}`}
+              groupName={element.groupName}
+              interval={element.interval}
+              sounds={element.sounds}
+              isPlaying={this.state.isPlaying}
+            />
           </Accordion>
         )
       })
@@ -49,7 +45,12 @@ class AmbPage extends React.Component {
             <Button>Edit</Button>
           </Col>
           <Col className="text-center">
-            <Button onClick={()=>this.setState({ isPlaying: !this.state.isPlaying })}>Play</Button>
+            <Button
+              variant={this.state.isPlaying ? "success" : "warning"}
+              onClick={()=>this.setState({ isPlaying: !this.state.isPlaying })}
+            >
+                Play
+            </Button>
           </Col>
           <Col className="text-start">
             <Button>Favorite</Button>

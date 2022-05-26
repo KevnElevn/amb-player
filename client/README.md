@@ -7,10 +7,10 @@ An Amb is a collection of data that defines and configures the soundscape. They 
 
     Sound Groups
     -Title
+    -Interval between plays (in seconds)
     -Sound Elements
     --Name
     --URL
     --Volume
     --Start and end timestamps (in seconds)
-    --Interval between plays (in seconds)
     --Number of additional times played before interval
