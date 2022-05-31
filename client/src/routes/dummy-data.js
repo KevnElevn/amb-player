@@ -1,5 +1,6 @@
 export const Beach = {
   ambId: 2,
+  ambName: "Beach",
   ambData: [
     {
       groupName: "Ocean",

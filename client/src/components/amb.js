@@ -6,18 +6,33 @@ import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import SoundGroup from "./sound-group"
 
-class AmbPage extends React.Component {
+class Amb extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       isLoggedIn: this.props.isLoggedIn,
       isPlaying: false,
+      ambName: '',
+      ambData: [],
     }
+  }
+
+  componentDidMount() {
+    fetch('http://localhost:3001/amb/'+this.props.ambId)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({ ambName: result.ambName, ambData: result.ambData });
+        },
+        (error) => {
+          console.log(error);
+        }
+      )
   }
 
   renderSoundGroups() {
     return (
-      this.props.soundGroups.map((element, index) => {
+      this.state.ambData.map((element, index) => {
         return (
           <Accordion>
             <SoundGroup
@@ -38,7 +53,7 @@ class AmbPage extends React.Component {
     return(
       <Container>
         <Row className="text-center mt-2">
-          <h3>Amb #{this.props.ambId}</h3>
+          <h2>{this.state.ambName}</h2>
         </Row>
         <Row className="mt-2">
           <Col className="text-end">
@@ -65,4 +80,4 @@ class AmbPage extends React.Component {
   }
 }
 
-export default AmbPage;
+export default Amb;
