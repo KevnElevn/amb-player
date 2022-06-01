@@ -14,3 +14,6 @@ An Amb is a collection of data that defines and configures the soundscape. They 
     --Volume
     --Start and end timestamps (in seconds)
     --Number of additional times played before interval
+
+Notes to use:
+-Needs file 'connection.js' with database URL

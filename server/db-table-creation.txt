@@ -1,0 +1,34 @@
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username TEXT CHECK (char_length(username) <= 32)
+);
+
+CREATE TABLE ambs (
+  id SERIAL PRIMARY KEY,
+  name TEXT CHECK (char_length(name) <= 256),
+  owner_id INT REFERENCES users (id)
+);
+
+CREATE TABLE groups (
+  amb_id INT REFERENCES ambs (id),
+  group_id INT NOT NULL,
+  PRIMARY KEY (amb_id, group_id),
+  name TEXT CHECK (char_length(name) <= 256),
+  interval_from INT CHECK (interval_from >= 0 AND interval_from < 2000000000),
+  interval_to INT CHECK (interval_to >= 0 AND interval_to < 2000000000)
+);
+
+CREATE TABLE sounds (
+  amb_id INT NOT NULL,
+  group_id INT NOT NULL,
+  sound_id INT NOT NULL,
+  FOREIGN KEY (amb_id, group_id) REFERENCES groups (amb_id, group_id),
+  PRIMARY KEY (amb_id, group_id, sound_id),
+  name TEXT CHECK (char_length(name) <= 256),
+  url TEXT CHECK (char_length(url) <= 256),
+  volume SMALLINT CHECK (volume >= 0 AND volume <= 100),
+  time_start INT CHECK (time_start >= 0 AND time_start < 2000000000),
+  time_end INT CHECK (time_end >= 0 AND time_end < 2000000000),
+  chain_from INT CHECK (chain_from >= 0 AND chain_from < 2000000000),
+  chain_to INT CHECK (chain_to >= 0 AND chain_to < 2000000000)
+);
