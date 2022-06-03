@@ -3,13 +3,13 @@ import AmbTable from '../components/amb-table';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
-function BrowsePage(props) {
-  const [ambList, setAmbList] = useState([]);
+function MyAmbsPage(props) {
+  const [myAmbsList, setMyAmbsList] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:3001/browse")
+    fetch("http://localhost:3001/browse/?user="+props.userId)
       .then(res => res.json())
       .then(result => {
-        setAmbList(result);
+        setMyAmbsList(result);
       })
       .catch(error => {
         console.error(error);
@@ -18,13 +18,13 @@ function BrowsePage(props) {
   return (
     <Container>
       <Row className="text-center mt-2">
-        <h2>Browse</h2>
+        <h2>My Ambs</h2>
       </Row>
       <Row>
-        <AmbTable ambList={ambList} />
+        <AmbTable ambList={myAmbsList} />
       </Row>
     </Container>
   );
 }
 
-export default BrowsePage;
+export default MyAmbsPage;

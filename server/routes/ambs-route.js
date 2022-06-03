@@ -5,7 +5,7 @@ const db = require('../db.js');
 router.get('/:ambId', (req, res, next) => {
   console.log("GET /amb/"+req.params.ambId);
   db.task (async t => {
-    let ambInfo = await t.one('SELECT name, owner_id FROM ambs WHERE id = $1', [req.params.ambId]);
+    let ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1', [req.params.ambId]);
     let groupInfo = await t.any('SELECT group_id, name, interval_from, interval_to FROM groups WHERE amb_id = $1;', [req.params.ambId]);
     let soundsQueries = groupInfo.map((group) => t.any('SELECT * FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, group.group_id]));
     let soundsArr = await t.batch(soundsQueries);
@@ -30,7 +30,8 @@ router.get('/:ambId', (req, res, next) => {
     return ambObj = {
       ambId: req.params.ambId,
       ambName: ambInfo.name,
-      ambOwner: ambInfo.owner_id,
+      ambOwner: ambInfo.owner_name,
+      ambOwnerId: ambInfo.owner_id,
       ambData: groupsArr,
     };
   })

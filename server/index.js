@@ -4,6 +4,7 @@ const app = express();
 const cors = require("cors");
 
 const amb = require('./routes/ambs-route.js');
+const browse = require('./routes/browse-route.js');
 
 app.use(cors());
 
@@ -13,6 +14,7 @@ app.get("/", (req, res  ) => {
 });
 
 app.use('/amb', amb);
+app.use('/browse', browse);
 
 app.use((err, req, res, next) => {
   console.error(err);

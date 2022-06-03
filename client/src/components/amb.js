@@ -13,6 +13,8 @@ class Amb extends React.Component {
       isLoggedIn: this.props.isLoggedIn,
       isPlaying: false,
       ambName: '',
+      ambOwner: '',
+      ambOwnerId: -1,
       ambData: [],
     }
   }
@@ -20,30 +22,26 @@ class Amb extends React.Component {
   componentDidMount() {
     fetch('http://localhost:3001/amb/'+this.props.ambId)
       .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({ ambName: result.ambName, ambData: result.ambData });
-        },
-        (error) => {
-          console.log(error);
-        }
-      )
+      .then((result) => {
+        this.setState({ ambName: result.ambName, ambOwner: result.ambOwner, ambOwnerId: result.ambOwnerId, ambData: result.ambData });
+      })
+      .catch(error => {
+        console.error(error);
+      })
   }
 
   renderSoundGroups() {
     return (
       this.state.ambData.map((element, index) => {
         return (
-          <Accordion>
-            <SoundGroup
-              key={`${this.props.ambId}+${element.groupId}`}
-              id={`${this.props.ambId}+${element.groupId}`}
-              groupName={element.groupName}
-              interval={element.interval}
-              sounds={element.sounds}
-              isPlaying={this.state.isPlaying}
-            />
-          </Accordion>
+          <SoundGroup
+            key={`${this.props.ambId}+${element.groupId}`}
+            id={`${this.props.ambId}+${element.groupId}`}
+            groupName={element.groupName}
+            interval={element.interval}
+            sounds={element.sounds}
+            isPlaying={this.state.isPlaying}
+          />
         )
       })
     );
@@ -54,6 +52,9 @@ class Amb extends React.Component {
       <Container>
         <Row className="text-center mt-2">
           <h2>{this.state.ambName}</h2>
+        </Row>
+        <Row className="text-center mt-2">
+          <h6>By: {this.state.ambOwner}</h6>
         </Row>
         <Row className="mt-2">
           <Col className="text-end">
@@ -74,7 +75,11 @@ class Amb extends React.Component {
         <Row className="mt-2">
           <Button>+</Button>
         </Row>
-        {this.renderSoundGroups()}
+        <Row>
+          <Accordion>
+            {this.renderSoundGroups()}
+          </Accordion>
+        </Row>
       </Container>
     );
   }
