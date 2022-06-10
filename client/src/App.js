@@ -19,13 +19,12 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoggedIn: true,
       userId: 1,
     };
   }
 
   renderMyAmb() {
-    if(this.state.isLoggedIn) {
+    if(this.state.userId > 0) {
       return(
         <Nav.Item>
             <Nav.Link as={NavLink} to="/myambs">My Ambs</Nav.Link>
@@ -62,10 +61,10 @@ class App extends React.Component {
           <Outlet />
         </div>
         <Routes>
-          <Route path="myambs" element={<MyAmbsPage isLoggedIn={this.state.isLoggedIn} userId={this.state.userId} />} />
-          <Route path="search" element={<SearchPage isLoggedIn={this.state.isLoggedIn} />} />
-          <Route path="browse" element={<BrowsePage isLoggedIn={this.state.isLoggedIn} />} />
-          <Route path="amb/:ambId" element={<AmbPage isLoggedIn={this.state.isLoggedIn} />} />
+          <Route path="myambs" element={<MyAmbsPage userId={this.state.userId} />} />
+          <Route path="search" element={<SearchPage userId={this.state.userId} />} />
+          <Route path="browse" element={<BrowsePage userId={this.state.userId} />} />
+          <Route path="amb/:ambId" element={<AmbPage userId={this.state.userId} />} />
           <Route path="*" element={<main style={{ padding:"1rem"}}><p>There's nothing here!</p></main>} />
         </Routes>
 

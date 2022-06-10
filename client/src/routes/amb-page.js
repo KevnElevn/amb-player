@@ -12,7 +12,7 @@ function AmbPage(props){
     if(editing) {
       return (
         <EditAmb
-          isLoggedIn={props.isLoggedIn}
+          userId={props.userId}
           ambId={params.ambId}
           toggleEdit={() => setEditing(!editing)}
         />
@@ -20,7 +20,7 @@ function AmbPage(props){
     } else {
       return (
         <Amb
-          isLoggedIn={props.isLoggedIn}
+          userId={props.userId}
           ambId={params.ambId}
           toggleEdit={() => setEditing(!editing)}
         />

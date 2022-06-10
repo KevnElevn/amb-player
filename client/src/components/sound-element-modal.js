@@ -19,6 +19,7 @@ function SoundElementModal(props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: props.userId,
           soundId: -1,
           soundName: soundName,
           url: soundUrl,
@@ -30,7 +31,7 @@ function SoundElementModal(props) {
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then((res) => res.json())
-        .then((res) => console.log("POST created new sound for" + props.groupId, res))
+        .then((res) => console.log("POST created new sound for " + props.groupId, res))
         .catch((error) => console.error(error));
   }
   return (
@@ -45,8 +46,8 @@ function SoundElementModal(props) {
       <Modal.Body>
       <Row>
         <Form>
-          <Form.Group controlId="formGroupName">
-            <Form.Label>Group Name</Form.Label>
+          <Form.Group controlId="formSoundName">
+            <Form.Label>Sound Name</Form.Label>
             <Form.Control
               value={soundName}
               onChange={(e) => setSoundName(e.target.value)}

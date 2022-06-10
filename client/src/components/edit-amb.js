@@ -37,8 +37,8 @@ class EditAmb extends React.Component {
       this.state.ambData.map((element, index) => {
         return (
           <EditSoundGroup
+            userId={this.props.userId}
             key={`${this.props.ambId}+${element.groupId}`}
-            id={`${this.props.ambId}+${element.groupId}`}
             ambId={this.props.ambId}
             groupId={element.groupId}
             groupName={element.groupName}
@@ -53,17 +53,6 @@ class EditAmb extends React.Component {
   handleChange(stateName, e) {
     this.setState({ [stateName]: e.target.value });
   }
-
-  // addSoundGroup() {
-  //   const requestOptions = {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       groupId: -1,
-  //     });
-  //   }
-  //   fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
-  // }
 
   render() {
     return(
@@ -107,6 +96,7 @@ class EditAmb extends React.Component {
             +
           </Button>
           <SoundGroupModal
+            userId={this.props.userId}
             ambId={this.props.ambId}
             show={this.state.showCreateModal}
             handleClose={() => this.setState({ showCreateModal: false })}
