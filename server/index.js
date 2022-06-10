@@ -2,11 +2,13 @@ const express = require("express");
 const PORT = process.env.PORT || 3001;
 const app = express();
 const cors = require("cors");
+const bodyParser = require('body-parser');
 
 const amb = require('./routes/ambs-route.js');
 const browse = require('./routes/browse-route.js');
 
 app.use(cors());
+app.use(bodyParser.json());
 
 app.get("/", (req, res  ) => {
   console.log('GET /');

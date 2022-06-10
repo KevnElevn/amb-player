@@ -45,4 +45,44 @@ router.get('/:ambId', (req, res, next) => {
     });
 });
 
+router.post('/:ambId', (req, res, next) => {
+  if(req.body.groupId === -1 &&
+    typeof req.body.groupName === 'string' &&
+    Number.isInteger(req.body.interval.from) &&
+    Number.isInteger(req.body.interval.to)
+  ) {
+    db.one('INSERT INTO groups(amb_id, name, interval_from, interval_to) VALUES ($1, $2, $3, $4) RETURNING group_id;',
+    [req.params.ambId, req.body.groupName, req.body.interval.from, req.body.interval.to])
+      .then((data) => res.send({ groupId: data.group_id }))
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send("Something went wrong!");
+      });
+  } else {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
+router.post('/:ambId/:groupId', (req, res, next) => {
+  if(req.body.soundId === -1 &&
+    typeof req.body.soundName === 'string' &&
+    typeof req.body.url === 'string' &&
+    Number.isInteger(req.body.volume) &&
+    Number.isInteger(req.body.start) &&
+    Number.isInteger(req.body.end) &&
+    Number.isInteger(req.body.chain.from) &&
+    Number.isInteger(req.body.chain.to)
+  ) {
+    db.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING sound_id;',
+    [req.params.ambId, req.params.groupId, req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to])
+      .then((data) => res.send({ soundId: data.sound_id }))
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send("Something went wrong!");
+      });
+  } else {
+    res.status(500).send("Something went wrong!");
+  }
+});
+
 module.exports = router;

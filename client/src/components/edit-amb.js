@@ -4,18 +4,20 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
-import SoundGroup from "./sound-group"
+import Form from "react-bootstrap/Form";
+import EditSoundGroup from "./edit-sound-group";
+import SoundGroupModal from "./sound-group-modal";
 
-class Amb extends React.Component {
+class EditAmb extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       isLoggedIn: this.props.isLoggedIn,
-      isPlaying: false,
       ambName: '',
       ambOwner: '',
       ambOwnerId: -1,
       ambData: [],
+      showCreateModal: false,
     }
   }
 
@@ -34,24 +36,49 @@ class Amb extends React.Component {
     return (
       this.state.ambData.map((element, index) => {
         return (
-          <SoundGroup
+          <EditSoundGroup
             key={`${this.props.ambId}+${element.groupId}`}
             id={`${this.props.ambId}+${element.groupId}`}
+            ambId={this.props.ambId}
+            groupId={element.groupId}
             groupName={element.groupName}
             interval={element.interval}
             sounds={element.sounds}
-            isPlaying={this.state.isPlaying}
           />
         )
       })
     );
   }
 
+  handleChange(stateName, e) {
+    this.setState({ [stateName]: e.target.value });
+  }
+
+  // addSoundGroup() {
+  //   const requestOptions = {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       groupId: -1,
+  //     });
+  //   }
+  //   fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
+  // }
+
   render() {
     return(
       <Container>
-        <Row className="text-center mt-2">
-          <h2>{this.state.ambName}</h2>
+        <Row className="mt-2">
+          <Form>
+            <Form.Group controlId="ambNameForm">
+              <Form.Label>Amb Name</Form.Label>
+              <Form.Control
+                size="lg"
+                value={this.state.ambName}
+                onChange={(e) => this.handleChange("ambName", e)}
+              />
+            </Form.Group>
+          </Form>
         </Row>
         <Row className="text-center mt-2">
           <h6>By: {this.state.ambOwner}</h6>
@@ -61,19 +88,11 @@ class Amb extends React.Component {
             <Button
               onClick={() => this.props.toggleEdit()}
             >
-              Edit
-            </Button>
-          </Col>
-          <Col className="text-center">
-            <Button
-              variant={this.state.isPlaying ? "success" : "warning"}
-              onClick={()=>this.setState({ isPlaying: !this.state.isPlaying })}
-            >
-              Play
+              Finish
             </Button>
           </Col>
           <Col className="text-start">
-            <Button>Favorite</Button>
+            <Button>Save</Button>
           </Col>
         </Row>
         <Row>
@@ -81,9 +100,21 @@ class Amb extends React.Component {
             {this.renderSoundGroups()}
           </Accordion>
         </Row>
+        <Row className="mt-2">
+          <Button
+            onClick={() => this.setState({ showCreateModal: true })}
+          >
+            +
+          </Button>
+          <SoundGroupModal
+            ambId={this.props.ambId}
+            show={this.state.showCreateModal}
+            handleClose={() => this.setState({ showCreateModal: false })}
+          />
+        </Row>
       </Container>
     );
   }
 }
 
-export default Amb;
+export default EditAmb;
