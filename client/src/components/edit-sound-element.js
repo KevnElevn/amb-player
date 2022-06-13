@@ -19,11 +19,10 @@ function EditSoundElement(props){
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          soundId: props.soundId,
           userId: props.userId,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then((res) => res.json())
         .then((res) => {
           console.log(res.message);

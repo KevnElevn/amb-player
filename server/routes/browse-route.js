@@ -11,7 +11,7 @@ router.get('/', (req, res, next) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(500).send("Something went wrong!");
+        res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
     console.log(`GET /browse`);
@@ -21,7 +21,7 @@ router.get('/', (req, res, next) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(500).send("Something went wrong!");
+        res.status(500).send({ message: 'Something went wrong!' });
       });
     }
 });

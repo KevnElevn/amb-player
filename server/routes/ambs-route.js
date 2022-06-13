@@ -41,13 +41,43 @@ router.get('/:ambId', (req, res, next) => {
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).send("Something went wrong!");
+      res.status(500).send({ message: 'Something went wrong!' });
     });
+});
+
+router.post('/', (req, res, next) => {
+  if(req.body.userId > 0 &&
+    typeof req.body.ambName === 'string'
+  ) {
+    db.task(t => {
+      return t.one('SELECT id FROM users WHERE id = $1;', [req.body.userId])
+        .then(user => {
+          return t.one('INSERT INTO ambs (name, owner_id) VALUES ($1, $2) RETURNING id;', [req.body.ambName, req.body.userId])
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("User doesn't exist");
+          res.status(500).send({ message: 'Something went wrong!' });
+        });
+    })
+      .then((newAmb) => {
+        if(newAmb) {
+          console.log(`Created Amb ${newAmb.id} for user ${req.body.userId}`);
+          res.send({ ambId: newAmb.id })
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  } else {
+    console.log("Bad input");
+    res.status(500).send({ message: 'Something went wrong!' });
+  }
 });
 
 router.post('/:ambId', (req, res, next) => {
   if(req.body.userId > 0 &&
-    req.body.groupId === -1 &&
     typeof req.body.groupName === 'string' &&
     Number.isInteger(req.body.interval.from) &&
     Number.isInteger(req.body.interval.to)
@@ -61,23 +91,26 @@ router.post('/:ambId', (req, res, next) => {
         .catch((error) => {
           console.log(error);
           console.log("User not owner");
-          res.status(500).send("Something went wrong!");
+          res.status(500).send({ message: 'Something went wrong!' });
         });
     })
-      .then((data) => res.send({ groupId: data.group_id }))
+      .then((data) => {
+        if(data) {
+          res.send({ groupId: data.group_id });
+        }
+      })
       .catch((error) => {
         console.log(error);
-        res.status(500).send("Something went wrong!");
+        res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("bad input");
-    res.status(500).send("Something went wrong!");
+    console.log("Bad input");
+    res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
 router.post('/:ambId/:groupId', (req, res, next) => {
   if(req.body.userId > 0 &&
-    req.body.soundId === -1 &&
     typeof req.body.soundName === 'string' &&
     typeof req.body.url === 'string' &&
     Number.isInteger(req.body.volume) &&
@@ -95,90 +128,136 @@ router.post('/:ambId/:groupId', (req, res, next) => {
         .catch((error) => {
           console.log(error);
           console.log("User not owner");
-          res.status(500).send("Something went wrong!");
+          res.status(500).send({ message: 'Something went wrong!' });
         });
     })
-      .then((data) => res.send({ soundId: data.sound_id }))
+      .then((data) => {
+        if(data) {
+          res.send({ soundId: data.sound_id });
+        }
+      })
       .catch((error) => {
         console.log(error);
-        res.status(500).send("Something went wrong!");
+        res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("bad input")
-    res.status(500).send("Something went wrong!");
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
 router.delete('/:ambId', (req, res, next) => {
   if(req.body.userId > 0 &&
-    req.body.groupId > 0 &&
-    req.params.ambId > 0
+      req.params.ambId > 0
   ) {
     db.task(t => {
       return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
-        .then(owned => {
-          return t.none('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, req.body.groupId])
-            .then(empty => {
-              return t.one('DELETE FROM groups WHERE amb_id = $1 AND group_id = $2 RETURNING amb_id, group_id;', [req.params.ambId, req.body.groupId])
+        .then((amb) => {
+          return t.none('SELECT group_id FROM groups WHERE amb_id = $1;', [amb.id])
+            .then((groups) => {
+              if(!groups) {
+                return t.one('DELETE FROM ambs WHERE id = $1 AND owner_id = $2 RETURNING id;', [amb.id, req.body.userId])
+              }
             })
             .catch((error) => {
               console.log(error);
-              console.log('Sound group not empty');
-              res.status(500).send("Something went wrong!");
+              console.log('Amb not empty');
+              res.status(500).send({ message: 'Something went wrong!' });
             })
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
-          res.status(500).send("Something went wrong!");
-        });
+          console.log('Amb not found or not owner');
+          res.status(500).send({ message: 'Something went wrong!' });
+        })
     })
-      .then(result => {
-        if(result) {
-          const resMessage = "Deleted " + result.amb_id + ":" + result.group_id;
-          console.log(resMessage);
-          res.send({ message: resMessage });
+      .then((deleted) => {
+        if(deleted) {
+          console.log(`Deleted Amb ${deleted.id}`);
+          res.send({ message: 'Deleted Amb '+deleted.id });
         }
       })
       .catch((error) => {
         console.log(error);
-        res.status(500).send("Something went wrong!");
-      });
+        console.log('Amb not found or not owner');
+        res.status(500).send({ message: 'Something went wrong!' });
+      })
   } else {
-    console.log("bad input")
-    res.status(500).send("Something went wrong!");
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
 router.delete('/:ambId/:groupId', (req, res, next) => {
   if(req.body.userId > 0 &&
-    req.params.ambId > 0 &&
     req.params.groupId > 0 &&
-    req.body.soundId > 0
+    req.params.ambId > 0
   ) {
     db.task(t => {
       return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
         .then(owned => {
-          return t.one('DELETE FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3 RETURNING amb_id, group_id, sound_id;', [req.params.ambId, req.params.groupId, req.body.soundId])
+          return t.none('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, req.params.groupId])
+            .then(empty => {
+              return t.one('DELETE FROM groups WHERE amb_id = $1 AND group_id = $2 RETURNING amb_id, group_id;', [req.params.ambId, req.params.groupId])
+            })
+            .catch((error) => {
+              console.log(error);
+              console.log('Sound group not empty');
+              res.status(500).send({ message: 'Something went wrong!' });
+            })
         })
         .catch((error) => {
           console.log(error);
           console.log("User not owner");
-          res.status(500).send("Something went wrong!");
+          res.status(500).send({ message: 'Something went wrong!' });
         });
     })
       .then(result => {
-        const resMessage = "Deleted " + result.amb_id + ":" + result.group_id + ":" + result.sound_id;
-        console.log(resMessage);
-        res.send({ message: resMessage });
+        if(result) {
+          console.log(`Deleted group ${result.group_id} from Amb ${result.amb_id}`)
+          res.send({ message: `Deleted group ${result.group_id} from Amb ${result.amb_id}` });
+        }
       })
       .catch((error) => {
         console.log(error);
-        res.status(500).send("Something went wrong!");
+        res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("bad input")
-    res.status(500).send("Something went wrong!");
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
+  }
+});
+
+router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
+  if(req.body.userId > 0 &&
+    req.params.ambId > 0 &&
+    req.params.groupId > 0 &&
+    req.params.soundId > 0
+  ) {
+    db.task(t => {
+      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
+        .then(owned => {
+          return t.one('DELETE FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3 RETURNING amb_id, group_id, sound_id;', [req.params.ambId, req.params.groupId, req.params.soundId])
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("User not owner");
+          res.status(500).send({ message: 'Something went wrong!' });
+        });
+    })
+      .then((result) => {
+        if(result) {
+          console.log(`Deleted sound ${result.sound_id} from group ${result.group_id} in Amb ${result.amb_id}`);
+          res.send({ message: `Deleted sound ${result.sound_id} from group ${result.group_id} in Amb ${result.amb_id}` });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  } else {
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 

@@ -20,7 +20,6 @@ function SoundElementModal(props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: props.userId,
-          soundId: -1,
           soundName: soundName,
           url: soundUrl,
           volume: soundVolume,

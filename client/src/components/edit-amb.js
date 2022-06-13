@@ -1,18 +1,24 @@
 import React from "react";
+import EditSoundGroup from "./edit-sound-group";
+import SoundGroupModal from "./sound-group-modal";
+import { Navigate } from 'react-router-dom';
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Accordion from "react-bootstrap/Accordion";
 import Form from "react-bootstrap/Form";
-import EditSoundGroup from "./edit-sound-group";
-import SoundGroupModal from "./sound-group-modal";
+import Alert from "react-bootstrap/Alert";
 
 class EditAmb extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       isLoggedIn: this.props.isLoggedIn,
+      isDeleting: false,
+      showAlert: false,
+      alertMessage: '',
+      exitPage: false,
       ambName: '',
       ambOwner: '',
       ambOwnerId: -1,
@@ -36,6 +42,27 @@ class EditAmb extends React.Component {
     this.fetchData();
   }
 
+  postDeleteAmb() {
+    if(this.state.ambData.length > 0) {
+      this.setState({ showAlert: true, alertMessage: 'Amb must be empty to delete!' });
+      return;
+    }
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: this.props.userId,
+        })
+      };
+      fetch(`http://localhost:3001/amb/${this.props.ambId}`, requestOptions)
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res.message);
+          this.setState({ exitPage: true });
+        })
+        .catch((error) => console.error(error));
+  }
+
   renderSoundGroups() {
     return (
       this.state.ambData.map((element, index) => {
@@ -55,6 +82,56 @@ class EditAmb extends React.Component {
     );
   }
 
+  renderDeleteButton() {
+    if(this.state.isDeleting) {
+      return (
+        <Col>
+          <Button
+            className="me-2"
+            variant="secondary"
+            onClick={() => this.setState({ isDeleting: false })}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => this.postDeleteAmb()}
+          >
+            Delete
+          </Button>
+        </Col>
+      );
+    } else {
+      return (
+        <Col>
+          <Button
+            variant="warning"
+            onClick={() => this.setState({ isDeleting: true })}
+          >
+            Delete Amb
+          </Button>
+        </Col>
+      );
+    }
+  }
+
+  renderAlert() {
+    if(this.state.showAlert) {
+      return (
+        <Alert
+          className="my-2"
+          variant="danger"
+          onClose={() => this.setState({ showAlert: false })}
+          dismissible
+        >
+          {this.state.alertMessage}
+        </Alert>
+      );
+    } else {
+      return null;
+    }
+  }
+
   handleChange(stateName, e) {
     this.setState({ [stateName]: e.target.value });
   }
@@ -62,6 +139,7 @@ class EditAmb extends React.Component {
   render() {
     return(
       <Container>
+        {this.renderAlert()}
         <Row className="mt-2">
           <Form>
             <Form.Group controlId="ambNameForm">
@@ -85,8 +163,11 @@ class EditAmb extends React.Component {
               Finish
             </Button>
           </Col>
-          <Col className="text-start">
+          <Col className="text-center">
             <Button>Save</Button>
+          </Col>
+          <Col className="text-start">
+            {this.renderDeleteButton()}
           </Col>
         </Row>
         <Row>
@@ -108,6 +189,7 @@ class EditAmb extends React.Component {
             refresh={() => this.fetchData()}
           />
         </Row>
+        {this.state.exitPage ? <Navigate to="/myambs" /> : null}
       </Container>
     );
   }

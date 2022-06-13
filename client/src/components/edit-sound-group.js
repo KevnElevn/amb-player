@@ -31,11 +31,10 @@ function EditSoundGroup(props){
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          groupId: props.groupId,
           userId: props.userId,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}`, requestOptions)
+      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then((res) => res.json())
         .then((res) => {
           console.log(res.message);

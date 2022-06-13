@@ -16,7 +16,6 @@ function SoundGroupModal(props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: props.userId,
-          groupId: -1,
           groupName: groupName,
           interval: { from: intervalFrom, to: intervalTo },
         })
@@ -24,7 +23,7 @@ function SoundGroupModal(props) {
       fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
         .then((res) => res.json())
         .then((res) => {
-          console.log("POST created new group " + res.groupId);
+          console.log("POST created new group " + res.groupId + "for Amb " + props.ambId);
           props.refresh();
           props.handleClose();
         })

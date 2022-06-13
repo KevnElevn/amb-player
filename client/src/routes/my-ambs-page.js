@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import AmbTable from '../components/amb-table';
+import AmbModal from '../components/amb-modal';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -7,7 +8,8 @@ import Button from 'react-bootstrap/Button';
 
 function MyAmbsPage(props) {
   const [myAmbsList, setMyAmbsList] = useState([]);
-  useEffect(() => {
+  const [showAmbModal, setShowAmbModal] = useState(false);
+  const fetchData = () => {
     fetch("http://localhost:3001/browse/?user="+props.userId)
       .then(res => res.json())
       .then(result => {
@@ -16,7 +18,10 @@ function MyAmbsPage(props) {
       .catch(error => {
         console.error(error);
       })
-  }, [props]);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <Container>
       <Row className="text-center mt-2">
@@ -26,6 +31,7 @@ function MyAmbsPage(props) {
         <Col>
           <Button
             variant="primary"
+            onClick={() => setShowAmbModal(true)}
           >
             Create
           </Button>
@@ -34,6 +40,12 @@ function MyAmbsPage(props) {
       <Row>
         <AmbTable ambList={myAmbsList} />
       </Row>
+      <AmbModal
+        userId={props.userId}
+        show={showAmbModal}
+        handleClose={() => setShowAmbModal(false)}
+        refresh={() => fetchData()}
+      />
     </Container>
   );
 }
