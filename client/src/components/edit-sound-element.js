@@ -25,7 +25,10 @@ function EditSoundElement(props){
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then((res) => res.json())
-        .then((res) => console.log(res.message))
+        .then((res) => {
+          console.log(res.message);
+          props.refresh();
+        })
         .catch((error) => console.error(error));
   }
   const renderDeleteButton = () => {

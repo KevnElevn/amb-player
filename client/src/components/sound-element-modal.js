@@ -31,7 +31,11 @@ function SoundElementModal(props) {
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then((res) => res.json())
-        .then((res) => console.log("POST created new sound for " + props.groupId, res))
+        .then((res) => {
+          console.log("POST created sound " + res.soundId + " for group " + props.groupId);
+          props.refresh();
+          props.handleClose();
+        })
         .catch((error) => console.error(error));
   }
   return (

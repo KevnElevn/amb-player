@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 
 function EditSoundGroup(props){
   const [groupName, setGroupName] = useState(props.groupName);
@@ -14,11 +15,18 @@ function EditSoundGroup(props){
   const [soundsArray, setSoundsArray] = useState(props.sounds);
   const [showModal, setShowModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const saveChanges = () => {
     console.log("saved");
   }
 
   const deleteSoundGroup = () => {
+    if(props.sounds.length > 0) {
+      setAlertMessage('Sound group must be empty to delete!');
+      setShowAlert(true);
+      return;
+    }
     const requestOptions = {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -29,7 +37,10 @@ function EditSoundGroup(props){
       };
       fetch(`http://localhost:3001/amb/${props.ambId}`, requestOptions)
         .then((res) => res.json())
-        .then((res) => console.log(res.message))
+        .then((res) => {
+          console.log(res.message);
+          props.refresh();
+        })
         .catch((error) => console.error(error));
   }
   const renderSaveButton = () => {
@@ -85,7 +96,7 @@ function EditSoundGroup(props){
     }
   }
   const renderSoundElements = () => {
-    return soundsArray.map((element) => {
+    return props.sounds.map((element) => {
       return (
         <EditSoundElement
           key={`${props.groupId}+${element.id}`}
@@ -99,10 +110,28 @@ function EditSoundGroup(props){
           start={element.start}
           end={element.end}
           chain={element.chain}
+          refresh={() => props.refresh()}
         />
       );
     });
   };
+
+  const renderAlert = () => {
+    if(showAlert) {
+      return (
+        <Alert
+          className="my-2"
+          variant="danger"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          {alertMessage}
+        </Alert>
+      );
+    } else {
+      return null;
+    }
+  }
 
   return (
     <Row className="border mt-2">
@@ -110,6 +139,7 @@ function EditSoundGroup(props){
         <Accordion.Header>
           <Col className="overflow-auto">{groupName}</Col>
         </Accordion.Header>
+        {renderAlert()}
         <Accordion.Body>
           <Row>
             <Col xs={8}>
@@ -166,6 +196,7 @@ function EditSoundGroup(props){
             groupId={props.groupId}
             show={showModal}
             handleClose={() => setShowModal(false)}
+            refresh={() => props.refresh()}
           />
         </Accordion.Body>
       </Accordion.Item>

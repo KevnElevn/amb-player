@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import AmbTable from '../components/amb-table';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 
 function MyAmbsPage(props) {
   const [myAmbsList, setMyAmbsList] = useState([]);
@@ -19,6 +21,15 @@ function MyAmbsPage(props) {
     <Container>
       <Row className="text-center mt-2">
         <h2>My Ambs</h2>
+      </Row>
+      <Row className="text-start">
+        <Col>
+          <Button
+            variant="primary"
+          >
+            Create
+          </Button>
+        </Col>
       </Row>
       <Row>
         <AmbTable ambList={myAmbsList} />

@@ -21,7 +21,7 @@ class EditAmb extends React.Component {
     }
   }
 
-  componentDidMount() {
+  fetchData() { console.log("fetching");
     fetch('http://localhost:3001/amb/'+this.props.ambId)
       .then(res => res.json())
       .then((result) => {
@@ -30,6 +30,10 @@ class EditAmb extends React.Component {
       .catch(error => {
         console.error(error);
       })
+  }
+
+  componentDidMount() {
+    this.fetchData();
   }
 
   renderSoundGroups() {
@@ -44,6 +48,7 @@ class EditAmb extends React.Component {
             groupName={element.groupName}
             interval={element.interval}
             sounds={element.sounds}
+            refresh={() => this.fetchData()}
           />
         )
       })
@@ -100,6 +105,7 @@ class EditAmb extends React.Component {
             ambId={this.props.ambId}
             show={this.state.showCreateModal}
             handleClose={() => this.setState({ showCreateModal: false })}
+            refresh={() => this.fetchData()}
           />
         </Row>
       </Container>

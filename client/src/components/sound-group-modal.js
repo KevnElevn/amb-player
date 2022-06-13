@@ -23,7 +23,11 @@ function SoundGroupModal(props) {
       };
       fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
         .then((res) => res.json())
-        .then((res) => console.log("POST created new group ", res))
+        .then((res) => {
+          console.log("POST created new group " + res.groupId);
+          props.refresh();
+          props.handleClose();
+        })
         .catch((error) => console.error(error));
   }
   return (
