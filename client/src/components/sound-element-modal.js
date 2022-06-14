@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
@@ -13,6 +13,43 @@ function SoundElementModal(props) {
   const [endTime, setEndTime] = useState(-1);
   const [chainFrom, setChainFrom] = useState(0);
   const [chainTo, setChainTo] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if(props.edit) {
+      setSoundName(props.name);
+      setSoundUrl(props.url);
+      setSoundVolume(props.volume);
+      setStartTime(props.start);
+      setEndTime(props.end);
+      setChainFrom(props.chain.from);
+      setChainTo(props.chain.to);
+    }
+  }, []);
+
+  const putEditSound = () => {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: props.userId,
+          soundName: soundName,
+          url: soundUrl,
+          volume: soundVolume,
+          start: startTime,
+          end: endTime,
+          chain: { from: chainFrom, to: chainTo },
+        })
+      };
+      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(`Updated Sound ${res.sound_id} of group ${res.group_id} in Amb ${res.amb_id}`);
+          props.refresh();
+          props.handleClose();
+        })
+        .catch((error) => console.error(error));
+  }
 
   const postNewSound = () => {
     const requestOptions = {
@@ -37,6 +74,66 @@ function SoundElementModal(props) {
         })
         .catch((error) => console.error(error));
   }
+
+  const deleteSoundElement = () => {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: props.userId,
+        })
+      };
+      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(`Deleted sound ${res.sound_id} from group ${res.group_id} in Amb ${res.amb_id}`);
+          props.refresh();
+        })
+        .catch((error) => console.error(error));
+  }
+
+  const renderDeleteButton = () => {
+    if(isDeleting) {
+      return (
+        <Col className="text-start">
+          <Button
+            className="me-2 mb-2"
+            variant="secondary"
+            onClick={() => setIsDeleting(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="me-2 mb-2"
+            variant="danger"
+            onClick={() => deleteSoundElement()}
+          >
+            Delete
+          </Button>
+        </Col>
+      );
+    } else {
+      return (
+        <Col className="text-start">
+          <Button
+            className="mb-2"
+            variant="warning"
+            onClick={() => setIsDeleting(true)}
+          >
+            Delete
+          </Button>
+        </Col>
+      );
+    }
+  }
+
+  const handleSave = () => {
+    if(props.edit)
+      putEditSound();
+    else
+      postNewSound();
+  }
+
   return (
     <Modal
       size="lg"
@@ -44,7 +141,7 @@ function SoundElementModal(props) {
       onHide={() => props.handleClose()}
     >
       <Modal.Header closeButton>
-        <Modal.Title>Create new sound element</Modal.Title>
+        <Modal.Title>{props.edit ? "Edit" : "Create new" } sound element</Modal.Title>
       </Modal.Header>
       <Modal.Body>
       <Row>
@@ -82,7 +179,7 @@ function SoundElementModal(props) {
         />
       </Row>
       <Row className="mt-2 pb-2">
-        <Col sm={2}>
+        <Col sm={3}>
           Timestamp
         </Col>
         <Col>
@@ -105,7 +202,7 @@ function SoundElementModal(props) {
         </Col>
         </Row>
         <Row>
-          <Col sm={2}>
+          <Col sm={3}>
             Chain
           </Col>
           <Col>
@@ -129,8 +226,11 @@ function SoundElementModal(props) {
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => props.handleClose()}>Close</Button>
-        <Button variant="primary" onClick={() => postNewSound()}>Save</Button>
+        {props.edit ? renderDeleteButton() : null}
+        <Col className="text-end">
+          <Button className="ms-2 mb-2" variant="secondary" onClick={() => props.handleClose()}>Close</Button>
+          <Button className="ms-2 mb-2" variant="primary" onClick={() => handleSave()}>Save</Button>
+        </Col>
       </Modal.Footer>
     </Modal>
   );

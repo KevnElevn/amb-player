@@ -37,7 +37,7 @@ function EditSoundGroup(props){
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then((res) => res.json())
         .then((res) => {
-          console.log(res.message);
+          console.log(`Deleted group ${res.group_id} from Amb ${res.amb_id}`);
           props.refresh();
         })
         .catch((error) => console.error(error));
@@ -190,6 +190,7 @@ function EditSoundGroup(props){
             </Button>
           </Row>
           <SoundElementModal
+            edit={false}
             userId={props.userId}
             ambId={props.ambId}
             groupId={props.groupId}

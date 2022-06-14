@@ -42,7 +42,7 @@ class EditAmb extends React.Component {
     this.fetchData();
   }
 
-  postDeleteAmb() {
+  deleteAmb() {
     if(this.state.ambData.length > 0) {
       this.setState({ showAlert: true, alertMessage: 'Amb must be empty to delete!' });
       return;
@@ -57,7 +57,7 @@ class EditAmb extends React.Component {
       fetch(`http://localhost:3001/amb/${this.props.ambId}`, requestOptions)
         .then((res) => res.json())
         .then((res) => {
-          console.log(res.message);
+          console.log('Deleted Amb ' + res.id );
           this.setState({ exitPage: true });
         })
         .catch((error) => console.error(error));
@@ -95,7 +95,7 @@ class EditAmb extends React.Component {
           </Button>
           <Button
             variant="danger"
-            onClick={() => this.postDeleteAmb()}
+            onClick={() => this.deleteAmb()}
           >
             Delete
           </Button>

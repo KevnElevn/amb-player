@@ -171,10 +171,10 @@ router.delete('/:ambId', (req, res, next) => {
           res.status(500).send({ message: 'Something went wrong!' });
         })
     })
-      .then((deleted) => {
-        if(deleted) {
-          console.log(`Deleted Amb ${deleted.id}`);
-          res.send({ message: 'Deleted Amb '+deleted.id });
+      .then((result) => {
+        if(result) {
+          console.log(`Deleted Amb ${result.id}`);
+          res.send(result);
         }
       })
       .catch((error) => {
@@ -215,7 +215,7 @@ router.delete('/:ambId/:groupId', (req, res, next) => {
       .then(result => {
         if(result) {
           console.log(`Deleted group ${result.group_id} from Amb ${result.amb_id}`)
-          res.send({ message: `Deleted group ${result.group_id} from Amb ${result.amb_id}` });
+          res.send(result);
         }
       })
       .catch((error) => {
@@ -248,7 +248,49 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
       .then((result) => {
         if(result) {
           console.log(`Deleted sound ${result.sound_id} from group ${result.group_id} in Amb ${result.amb_id}`);
-          res.send({ message: `Deleted sound ${result.sound_id} from group ${result.group_id} in Amb ${result.amb_id}` });
+          res.send(result);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  } else {
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
+  }
+});
+
+router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
+  if(req.body.userId > 0 &&
+    req.params.ambId > 0 &&
+    req.params.groupId > 0 &&
+    req.params.soundId > 0 &&
+    typeof req.body.soundName === 'string' &&
+    typeof req.body.url === 'string' &&
+    req.body.volume >= 0 &&
+    req.body.volume <= 100 &&
+    req.body.start >= 0 &&
+    req.body.end >= -1 &&
+    req.body.chain.from >= 0 &&
+    req.body.chain.to >= 0
+  ) {
+    db.task(t => {
+      return t.one('SELECT ambs.owner_id, sounds.amb_id, sounds.group_id, sounds.sound_id FROM ambs JOIN sounds ON ambs.id = sounds.amb_id WHERE sounds.amb_id = $1 AND sounds.group_id = $2 AND sounds.sound_id = $3 AND ambs.owner_id = $4;', [req.params.ambId, req.params.groupId, req.params.soundId, req.body.userId])
+        .then(owned => {
+          return t.one('UPDATE sounds SET name = $1, url = $2, volume = $3, time_start = $4, time_end = $5, chain_from = $6, chain_to = $7 WHERE amb_id = $8 AND group_id = $9 AND sound_id = $10 RETURNING sounds.amb_id, sounds.group_id, sounds.sound_id;',
+          [req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to, req.params.ambId, req.params.groupId, req.params.soundId])
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("User not owner");
+          res.status(500).send({ message: 'Something went wrong!' });
+        });
+    })
+      .then(result => {
+        if(result) {
+          console.log(`Updated Sound ${result.sound_id} of group ${result.group_id} in Amb ${result.amb_id}`);
+          res.send(result);
         }
       })
       .catch((error) => {
