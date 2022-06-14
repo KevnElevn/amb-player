@@ -9,14 +9,14 @@ function EditSoundElement(props){
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <Row className="mt-2 py-2 border-bottom">
+    <Row className="mt-2 py-3 border-top">
       <Row>
         <Col xs={8}>
           <Row>
             <h6>Sound Name</h6>
           </Row>
           <Row className="mx-3">
-            <h3>{props.name}</h3>
+            <h4>{props.name}</h4>
           </Row>
         </Col>
         <Col className="text-end">

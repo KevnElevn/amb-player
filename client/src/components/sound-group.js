@@ -43,6 +43,7 @@ function SoundGroup(props){
         </Accordion.Header>
         <Accordion.Body>
           <Button
+            className="mb-1"
             variant={isGroupOn ? "success" : "danger"}
             onClick={() => setGroupOn(!isGroupOn)}
           >

@@ -9,7 +9,7 @@ function SoundElement(props){
   const ref = React.createRef();
   let loops = Math.floor(Math.random() * (props.chain.to - props.chain.from + 1)) + props.chain.from;
   return (
-    <Row className="mt-2 py-2 border-bottom">
+    <Row className="mt-2 py-3 border-top">
       <Row>
         <Col><h5>{props.name}</h5></Col>
         <Col xs={2} className="center-text">

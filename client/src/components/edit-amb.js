@@ -68,8 +68,8 @@ class EditAmb extends React.Component {
       this.state.ambData.map((element, index) => {
         return (
           <EditSoundGroup
-            userId={this.props.userId}
             key={`${this.props.ambId}+${element.groupId}`}
+            userId={this.props.userId}
             ambId={this.props.ambId}
             groupId={element.groupId}
             groupName={element.groupName}
@@ -182,6 +182,7 @@ class EditAmb extends React.Component {
             +
           </Button>
           <SoundGroupModal
+            edit={false}
             userId={this.props.userId}
             ambId={this.props.ambId}
             show={this.state.showCreateModal}

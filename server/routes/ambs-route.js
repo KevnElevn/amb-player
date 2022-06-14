@@ -80,7 +80,8 @@ router.post('/:ambId', (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.groupName === 'string' &&
     Number.isInteger(req.body.interval.from) &&
-    Number.isInteger(req.body.interval.to)
+    Number.isInteger(req.body.interval.to) &&
+    req.body.interval.to >= req.body.interval.from
   ) {
     db.task(t => {
       return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
@@ -120,7 +121,7 @@ router.post('/:ambId/:groupId', (req, res, next) => {
     Number.isInteger(req.body.chain.to)
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
+      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
         .then(owned => {
           return t.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING sound_id;',
           [req.params.ambId, req.params.groupId, req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to])
@@ -194,7 +195,7 @@ router.delete('/:ambId/:groupId', (req, res, next) => {
     req.params.ambId > 0
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
+      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
         .then(owned => {
           return t.none('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, req.params.groupId])
             .then(empty => {
@@ -261,6 +262,40 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
   }
 });
 
+router.put('/:ambId/:groupId', (req, res, next) => {
+  if(req.body.userId > 0 &&
+    req.params.ambId > 0 &&
+    req.params.groupId > 0 &&
+    typeof req.body.groupName === 'string' &&
+    req.body.interval.from >= 0 &&
+    req.body.interval.to >= req.body.interval.from
+  ) {
+    db.task(t => {
+      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
+        .then(owned => {
+          return t.one('UPDATE groups SET name = $1, interval_from = $2, interval_to = $3 WHERE amb_id = $4 AND group_id = $5 RETURNING amb_id, group_id;',
+          [req.body.groupName, req.body.interval.from, req.body.interval.to, req.params.ambId, req.params.groupId])
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("User not owner");
+          res.status(500).send({ message: 'Something went wrong!' });
+        });
+    })
+      .then(result => {
+        console.log(`Updated Group ${result.group_id} in Amb ${result.amb_id}`);
+        res.send(result);
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  } else {
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
+  }
+});
+
 router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
@@ -273,7 +308,7 @@ router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
     req.body.start >= 0 &&
     req.body.end >= -1 &&
     req.body.chain.from >= 0 &&
-    req.body.chain.to >= 0
+    req.body.chain.to >= req.body.chain.from
   ) {
     db.task(t => {
       return t.one('SELECT ambs.owner_id, sounds.amb_id, sounds.group_id, sounds.sound_id FROM ambs JOIN sounds ON ambs.id = sounds.amb_id WHERE sounds.amb_id = $1 AND sounds.group_id = $2 AND sounds.sound_id = $3 AND ambs.owner_id = $4;', [req.params.ambId, req.params.groupId, req.params.soundId, req.body.userId])
