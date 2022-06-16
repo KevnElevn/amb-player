@@ -27,7 +27,7 @@ class EditAmb extends React.Component {
     }
   }
 
-  fetchData() { console.log("fetching");
+  getData() { console.log("fetching");
     fetch('http://localhost:3001/amb/'+this.props.ambId)
       .then(res => res.json())
       .then((result) => {
@@ -38,8 +38,26 @@ class EditAmb extends React.Component {
       })
   }
 
+  putEditAmb() {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: this.props.userId,
+          ambName: this.state.ambName,
+        })
+      };
+      fetch(`http://localhost:3001/amb/${this.props.ambId}`, requestOptions)
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(`Updated Amb ${res.id}`);
+          this.getData();
+        })
+        .catch((error) => console.error(error));
+  }
+
   componentDidMount() {
-    this.fetchData();
+    this.getData();
   }
 
   deleteAmb() {
@@ -75,7 +93,7 @@ class EditAmb extends React.Component {
             groupName={element.groupName}
             interval={element.interval}
             sounds={element.sounds}
-            refresh={() => this.fetchData()}
+            refresh={() => this.getData()}
           />
         )
       })
@@ -155,7 +173,7 @@ class EditAmb extends React.Component {
         <Row className="text-center mt-2">
           <h6>By: {this.state.ambOwner}</h6>
         </Row>
-        <Row className="mt-2">
+        <Row className="my-2">
           <Col className="text-end">
             <Button
               onClick={() => this.props.toggleEdit()}
@@ -164,7 +182,11 @@ class EditAmb extends React.Component {
             </Button>
           </Col>
           <Col className="text-center">
-            <Button>Save</Button>
+            <Button
+              onClick={() => this.putEditAmb()}
+            >
+              Save
+            </Button>
           </Col>
           <Col className="text-start">
             {this.renderDeleteButton()}
@@ -175,19 +197,21 @@ class EditAmb extends React.Component {
             {this.renderSoundGroups()}
           </Accordion>
         </Row>
-        <Row className="mt-2">
-          <Button
-            onClick={() => this.setState({ showCreateModal: true })}
-          >
-            +
-          </Button>
+        <Row className="mt-4">
+          <Col className="text-center">
+            <Button
+              onClick={() => this.setState({ showCreateModal: true })}
+            >
+              Create New Group
+            </Button>
+          </Col>
           <SoundGroupModal
             edit={false}
             userId={this.props.userId}
             ambId={this.props.ambId}
             show={this.state.showCreateModal}
             handleClose={() => this.setState({ showCreateModal: false })}
-            refresh={() => this.fetchData()}
+            refresh={() => this.getData()}
           />
         </Row>
         {this.state.exitPage ? <Navigate to="/myambs" /> : null}

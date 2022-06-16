@@ -36,8 +36,10 @@ router.get('/:ambId', (req, res, next) => {
     };
   })
     .then((ambObj) => {
-      console.log("Success");
-      res.send(ambObj);
+      if(ambObj) {
+        console.log("Success");
+        res.send(ambObj);
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -262,6 +264,38 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
   }
 });
 
+router.put('/:ambId', (req, res, next) => {
+  if(req.body.userId > 0 &&
+    req.params.ambId > 0 &&
+    typeof req.body.ambName == 'string'
+  ) {
+    db.task(t => {
+      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
+        .then(amb => {
+          return t.one('UPDATE ambs SET name = $1 WHERE id = $2 AND owner_id = $3 RETURNING id, name;', [req.body.ambName, req.params.ambId, req.body.userId])
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("User not owner");
+          res.status(500).send({ message: 'Something went wrong!' });
+        });
+    })
+      .then(result => {
+        if(result) {
+          console.log(`Updated Amb ${result.id} name to ${result.name}`);
+          res.send(result);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  } else {
+    console.log("Bad input")
+    res.status(500).send({ message: 'Something went wrong!' });
+  }
+});
+
 router.put('/:ambId/:groupId', (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
@@ -283,8 +317,10 @@ router.put('/:ambId/:groupId', (req, res, next) => {
         });
     })
       .then(result => {
-        console.log(`Updated Group ${result.group_id} in Amb ${result.amb_id}`);
-        res.send(result);
+        if(result) {
+          console.log(`Updated Group ${result.group_id} in Amb ${result.amb_id}`);
+          res.send(result);
+        }
       })
       .catch((error) => {
         console.log(error);

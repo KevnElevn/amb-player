@@ -6,10 +6,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 
 function EditSoundGroup(props){
-  const [groupName, setGroupName] = useState(props.groupName);
   const [showCreateSoundModal, setShowCreateSoundModal] = useState(false);
   const [showEditGroupModal, setShowEditGroupModal] = useState(false);
 
