@@ -20,7 +20,7 @@ function SoundGroupModal(props) {
       setIntervalFrom(props.interval.from);
       setIntervalTo(props.interval.to);
     }
-  }, [])
+  }, [props])
 
   const postNewGroup = () => {
     const requestOptions = {
@@ -33,13 +33,21 @@ function SoundGroupModal(props) {
         })
       };
       fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log("Created new group " + res.group_id + "in Amb " + props.amb_id);
           props.refresh();
           props.handleClose();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
   }
 
   const putEditGroup = () => {
@@ -53,13 +61,21 @@ function SoundGroupModal(props) {
         })
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log(`Updated group ${res.group_id} from Amb ${res.amb_id}`);
           props.refresh();
           props.handleClose();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
   }
 
   const deleteSoundGroup = () => {
@@ -76,12 +92,20 @@ function SoundGroupModal(props) {
         })
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log(`Deleted group ${res.group_id} from Amb ${res.amb_id}`);
           props.refresh();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
   }
 
   const renderAlert = () => {

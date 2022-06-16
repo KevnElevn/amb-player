@@ -4,6 +4,7 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 
 function SoundElementModal(props) {
   const [soundName, setSoundName] = useState("New Sound Element");
@@ -14,6 +15,8 @@ function SoundElementModal(props) {
   const [chainFrom, setChainFrom] = useState(0);
   const [chainTo, setChainTo] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   useEffect(() => {
     if(props.edit) {
@@ -25,31 +28,7 @@ function SoundElementModal(props) {
       setChainFrom(props.chain.from);
       setChainTo(props.chain.to);
     }
-  }, []);
-
-  const putEditSound = () => {
-    const requestOptions = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: props.userId,
-          soundName: soundName,
-          url: soundUrl,
-          volume: soundVolume,
-          start: startTime,
-          end: endTime,
-          chain: { from: chainFrom, to: chainTo },
-        })
-      };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
-        .then((res) => res.json())
-        .then((res) => {
-          console.log(`Updated Sound ${res.sound_id} of group ${res.group_id} in Amb ${res.amb_id}`);
-          props.refresh();
-          props.handleClose();
-        })
-        .catch((error) => console.error(error));
-  }
+  }, [props]);
 
   const postNewSound = () => {
     const requestOptions = {
@@ -66,13 +45,53 @@ function SoundElementModal(props) {
         })
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log("Created sound " + res.soundId + " for group " + props.groupId);
           props.refresh();
           props.handleClose();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
+  }
+
+  const putEditSound = () => {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: props.userId,
+          soundName: soundName,
+          url: soundUrl,
+          volume: soundVolume,
+          start: startTime,
+          end: endTime,
+          chain: { from: chainFrom, to: chainTo },
+        })
+      };
+      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
+        .then((res) => {
+          console.log(`Updated Sound ${res.sound_id} of group ${res.group_id} in Amb ${res.amb_id}`);
+          props.refresh();
+          props.handleClose();
+        })
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
   }
 
   const deleteSoundElement = () => {
@@ -84,12 +103,37 @@ function SoundElementModal(props) {
         })
       };
       fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log(`Deleted sound ${res.sound_id} from group ${res.group_id} in Amb ${res.amb_id}`);
           props.refresh();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
+  }
+
+  const renderAlert = () => {
+    if(showAlert) {
+      return (
+        <Alert
+          className="my-2"
+          variant="danger"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          {alertMessage}
+        </Alert>
+      );
+    } else {
+      return null;
+    }
   }
 
   const renderDeleteButton = () => {
@@ -144,6 +188,7 @@ function SoundElementModal(props) {
         <Modal.Title>{props.edit ? "Edit" : "Create new" } sound element</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+      {renderAlert()}
       <Row>
         <Form>
           <Form.Group controlId="formSoundName">

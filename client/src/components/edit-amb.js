@@ -30,12 +30,17 @@ class EditAmb extends React.Component {
   getData() {
     console.log("Getting Amb data...");
     fetch('http://localhost:3001/amb/'+this.props.ambId)
-      .then(res => res.json())
+      .then(res => {
+        if(res.status >= 400)
+          throw new Error('Server error!');
+        return res.json();
+      })
       .then((result) => {
         this.setState({ ambName: result.ambName, ambOwner: result.ambOwner, ambOwnerId: result.ambOwnerId, ambData: result.ambData });
       })
       .catch(error => {
         console.error(error);
+        this.setState({ alertMessage: error.message, showAlert: true });
       })
   }
 
@@ -49,16 +54,19 @@ class EditAmb extends React.Component {
         })
       };
       fetch(`http://localhost:3001/amb/${this.props.ambId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log(`Updated Amb ${res.id}`);
           this.getData();
         })
-        .catch((error) => console.error(error));
-  }
-
-  componentDidMount() {
-    this.getData();
+        .catch(error => {
+          console.error(error);
+          this.setState({ alertMessage: error.message, showAlert: true });
+        })
   }
 
   deleteAmb() {
@@ -74,12 +82,23 @@ class EditAmb extends React.Component {
         })
       };
       fetch(`http://localhost:3001/amb/${this.props.ambId}`, requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log('Deleted Amb ' + res.id );
           this.setState({ exitPage: true });
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          this.setState({ alertMessage: error.message, showAlert: true });
+        })
+  }
+
+  componentDidMount() {
+    this.getData();
   }
 
   renderSoundGroups() {

@@ -1,12 +1,15 @@
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 
 function AmbModal(props) {
   const [ambName, setAmbName] = useState('New Amb');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
   const postNewAmb = () => {
     const requestOptions = {
         method: 'POST',
@@ -17,13 +20,38 @@ function AmbModal(props) {
         })
       };
       fetch('http://localhost:3001/amb/', requestOptions)
-        .then((res) => res.json())
+        .then(res => {
+          if(res.status >= 400)
+            throw new Error('Server error!');
+          return res.json();
+        })
         .then((res) => {
           console.log("POST created new amb " + res.ambId);
           props.refresh();
           props.handleClose();
         })
-        .catch((error) => console.error(error));
+        .catch(error => {
+          console.error(error);
+          setAlertMessage(error.message);
+          setShowAlert(true);
+        })
+  }
+
+  const renderAlert = () => {
+    if(showAlert) {
+      return (
+        <Alert
+          className="my-2"
+          variant="danger"
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          {alertMessage}
+        </Alert>
+      );
+    } else {
+      return null;
+    }
   }
 
   return (
@@ -35,6 +63,7 @@ function AmbModal(props) {
         <Modal.Title>Create new Amb</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {renderAlert()}
         <Row>
           <Form>
             <Form.Group controlId="formAmbName">
