@@ -5,28 +5,61 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
 
 function MyAmbsPage(props) {
   const [myAmbsList, setMyAmbsList] = useState([]);
   const [showAmbModal, setShowAmbModal] = useState(false);
-  const fetchData = () => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  const getData = () => {
+    console.log("Getting Ambs list...");
     fetch("http://localhost:3001/browse/?user="+props.userId)
-      .then(res => res.json())
+      .then(res => {
+        if(res.status >= 400)
+          throw new Error('Server error!');
+        return res.json();
+      })
       .then(result => {
         setMyAmbsList(result);
       })
       .catch(error => {
         console.error(error);
+        setAlertMessage(error.message);
+        setShowAlert(true);
       })
   };
+
   useEffect(() => {
-    fetchData();
+    getData();
   }, []);
+
+  const renderAlert = () => {
+    if(showAlert) {
+      return (
+        <Alert
+          className="my-2"
+          variant="danger"
+        >
+          <Row>
+            <Col className="text-center">
+              {alertMessage}
+            </Col>
+          </Row>
+        </Alert>
+      );
+    } else {
+      return null;
+    }
+  }
+
   return (
     <Container>
       <Row className="text-center mt-2">
         <h2>My Ambs</h2>
       </Row>
+      {renderAlert()}
       <Row className="text-start">
         <Col>
           <Button
@@ -44,7 +77,7 @@ function MyAmbsPage(props) {
         userId={props.userId}
         show={showAmbModal}
         handleClose={() => setShowAmbModal(false)}
-        refresh={() => fetchData()}
+        refresh={() => getData()}
       />
     </Container>
   );

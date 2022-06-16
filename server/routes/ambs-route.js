@@ -5,11 +5,28 @@ const db = require('../db.js');
 router.get('/:ambId', (req, res, next) => {
   console.log("GET /amb/"+req.params.ambId);
   db.task (async t => {
-    let ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1;', [req.params.ambId]);
-    let groupInfo = await t.any('SELECT group_id, name, interval_from, interval_to FROM groups WHERE amb_id = $1;', [req.params.ambId]);
-    let soundsQueries = groupInfo.map((group) => t.any('SELECT * FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, group.group_id]));
-    let soundsArr = await t.batch(soundsQueries);
-    let groupsArr = groupInfo.map((group, index) => {
+    let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr;
+    try {
+      ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1;', [req.params.ambId]);
+    } catch(error) {
+      throw error;
+    }
+    try {
+      groupInfo = await t.any('SELECT group_id, name, interval_from, interval_to FROM groups WHERE amb_id = $1;', [req.params.ambId]);
+    } catch(error) {
+      throw error;
+    }
+    try {
+      soundsQueries = groupInfo.map((group) => t.any('SELECT * FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, group.group_id]));
+    } catch(error) {
+      throw error;
+    }
+    try {
+      soundsArr = await t.batch(soundsQueries);
+    } catch(error) {
+      throw error;
+    }
+    groupsArr = groupInfo.map((group, index) => {
       return {
         groupName: group.name,
         groupId: group.group_id,
@@ -42,7 +59,7 @@ router.get('/:ambId', (req, res, next) => {
       }
     })
     .catch((error) => {
-      console.error(error);
+      console.log(error);
       res.status(500).send({ message: 'Something went wrong!' });
     });
 });
@@ -70,6 +87,7 @@ router.post('/', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not create new Amb');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -88,22 +106,24 @@ router.post('/:ambId', (req, res, next) => {
     db.task(t => {
       return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
         .then(owned => {
-          return t.one('INSERT INTO groups(amb_id, name, interval_from, interval_to) VALUES ($1, $2, $3, $4) RETURNING group_id;',
+          return t.one('INSERT INTO groups(amb_id, name, interval_from, interval_to) VALUES ($1, $2, $3, $4) RETURNING amb_id, group_id;',
           [req.params.ambId, req.body.groupName, req.body.interval.from, req.body.interval.to])
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
-      .then((data) => {
-        if(data) {
-          res.send({ groupId: data.group_id });
+      .then((newGroup) => {
+        if(newGroup) {
+          console.log(`Created new group ${newGroup.group_id} in Amb ${newGroup.amb_id}`);
+          res.send(newGroup);
         }
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not create new group');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -125,22 +145,24 @@ router.post('/:ambId/:groupId', (req, res, next) => {
     db.task(t => {
       return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
         .then(owned => {
-          return t.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING sound_id;',
+          return t.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING amb_id, group_id, sound_id;',
           [req.params.ambId, req.params.groupId, req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to])
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb/group not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
-      .then((data) => {
-        if(data) {
-          res.send({ soundId: data.sound_id });
+      .then((newSound) => {
+        if(newSound) {
+          console.log(`Created new sound ${newSound.sound_id} for group ${newSound.group_id} in Amb ${newSound.amb_id}`)
+          res.send(newSound);
         }
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not create new sonud');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -170,7 +192,7 @@ router.delete('/:ambId', (req, res, next) => {
         })
         .catch((error) => {
           console.log(error);
-          console.log('Amb not found or not owner');
+          console.log('Amb not found or user not owner');
           res.status(500).send({ message: 'Something went wrong!' });
         })
     })
@@ -182,7 +204,7 @@ router.delete('/:ambId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
-        console.log('Amb not found or not owner');
+        console.log('Could not delete Amb');
         res.status(500).send({ message: 'Something went wrong!' });
       })
   } else {
@@ -211,7 +233,7 @@ router.delete('/:ambId/:groupId', (req, res, next) => {
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb/group not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -223,6 +245,7 @@ router.delete('/:ambId/:groupId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not delete group');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -238,13 +261,13 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
     req.params.soundId > 0
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
+      return t.one('SELECT ambs.owner_id, sounds.amb_id, sounds.group_id, sounds.sound_id FROM ambs JOIN sounds ON ambs.id = sounds.amb_id WHERE sounds.amb_id = $1 AND sounds.group_id = $2 AND sounds.sound_id = $3 AND ambs.owner_id = $4;', [req.params.ambId, req.params.groupId, req.params.soundId, req.body.userId])
         .then(owned => {
           return t.one('DELETE FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3 RETURNING amb_id, group_id, sound_id;', [req.params.ambId, req.params.groupId, req.params.soundId])
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb/group/sound not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -256,6 +279,7 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not delete sound');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -288,6 +312,7 @@ router.put('/:ambId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not update Amb');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -312,7 +337,7 @@ router.put('/:ambId/:groupId', (req, res, next) => {
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb/group not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -324,6 +349,7 @@ router.put('/:ambId/:groupId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not update group');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
@@ -354,7 +380,7 @@ router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb/group/sound not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -366,6 +392,7 @@ router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        console.log('Could not update sound');
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {

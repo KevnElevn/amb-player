@@ -7,6 +7,7 @@ router.get('/', (req, res, next) => {
     console.log(`GET /browse/?user=${req.query.user}`);
     db.any('SELECT ambs.id, name, username AS owner_name FROM ambs JOIN users ON ambs.owner_id = users.id WHERE ambs.owner_id = $1;', [req.query.user])
       .then((ambInfo) => {
+        console.log('Success');
         res.send(ambInfo);
       })
       .catch((error) => {
@@ -17,6 +18,7 @@ router.get('/', (req, res, next) => {
     console.log(`GET /browse`);
     db.any('SELECT ambs.id, name, username AS owner_name FROM ambs JOIN users ON ambs.owner_id = users.id;')
       .then((ambInfo) => {
+        console.log('Success');
         res.send(ambInfo);
       })
       .catch((error) => {

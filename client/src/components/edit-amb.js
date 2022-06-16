@@ -27,7 +27,8 @@ class EditAmb extends React.Component {
     }
   }
 
-  getData() { console.log("fetching");
+  getData() {
+    console.log("Getting Amb data...");
     fetch('http://localhost:3001/amb/'+this.props.ambId)
       .then(res => res.json())
       .then((result) => {
