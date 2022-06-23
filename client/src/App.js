@@ -21,49 +21,43 @@ function App(props) {
   const [userId, setUserId] = useState(-1);
 
   const renderMyAmb = () => {
-    if(userId > 0) {
-      return(
-        <Nav.Item>
-            <Nav.Link as={NavLink} to="/myambs">My Ambs</Nav.Link>
-        </Nav.Item>
-      );
-    } else {
-      return (
-        <Nav.Item>
-            <Nav.Link as={NavLink} to="/login">Log in</Nav.Link>
-        </Nav.Item>
-      );
-    }
+    return (
+      <Nav.Item>
+        <Nav.Link as={NavLink} to="/myambs">My Ambs</Nav.Link>
+      </Nav.Item>
+    );
   }
 
   return (
     <BrowserRouter>
-      <div className="App">
-        <Navbar bg="dark" variant="dark">
-          <Navbar.Brand as={Link} to="/">AmbienceGen</Navbar.Brand>
-          <Nav>
-            {renderMyAmb()}
-            <Nav.Item>
-                <Nav.Link as={NavLink} to="/browse">Browse</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-                <Nav.Link as={NavLink} to="/search">Search</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={NavLink} to="/amb/1">Test Amb</Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Navbar>
-        <Outlet />
-      </div>
-      <Routes>
-        <Route path="myambs" element={<MyAmbsPage userId={userId} />} />
-        <Route path="search" element={<SearchPage userId={userId} />} />
-        <Route path="browse" element={<BrowsePage userId={userId} />} />
-        <Route path="amb/:ambId" element={<AmbPage userId={userId} />} />
-        <Route path="*" element={<main style={{ padding:"1rem"}}><p>There's nothing here!</p></main>} />
-      </Routes>
-
+      <Auth0ProviderWithHistory>
+        <div className="App">
+          <Navbar bg="dark" variant="dark">
+            <Navbar.Brand as={Link} to="/">AmbienceGen</Navbar.Brand>
+            <Nav>
+              {userId > 0 ? renderMyAmb() : null}
+              <Nav.Item>
+                  <Nav.Link as={NavLink} to="/browse">Browse</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                  <Nav.Link as={NavLink} to="/search">Search</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={NavLink} to="/amb/1">Test Amb</Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <AuthenticationButtons />
+          </Navbar>
+          <Outlet />
+        </div>
+        <Routes>
+          <Route path="myambs" element={<MyAmbsPage userId={userId} />} />
+          <Route path="search" element={<SearchPage userId={userId} />} />
+          <Route path="browse" element={<BrowsePage userId={userId} />} />
+          <Route path="amb/:ambId" element={<AmbPage userId={userId} />} />
+          <Route path="*" element={<main style={{ padding:"1rem"}}><p>There's nothing here!</p></main>} />
+        </Routes>
+      </Auth0ProviderWithHistory>
     </BrowserRouter>
   );
 }
