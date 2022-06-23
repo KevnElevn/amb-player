@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SoundGroupModal from "./sound-group-modal";
 import EditSoundElement from "./edit-sound-element";
 import SoundElementModal from "./sound-element-modal";
