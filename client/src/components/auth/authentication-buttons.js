@@ -6,8 +6,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Nav from 'react-bootstrap/Nav';
 
 function AuthenticationButtons() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth0();
   console.log('Authenticated: ', isAuthenticated);
+  if(isLoading)
+    return null;
   if(isAuthenticated) {
     return (
       <Nav className="ms-auto me-3">
