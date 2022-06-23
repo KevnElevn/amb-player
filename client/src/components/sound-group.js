@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SoundElement from "./sound-element";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";

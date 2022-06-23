@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SoundElementModal from "./sound-element-modal.js";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";

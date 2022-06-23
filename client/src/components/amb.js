@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -7,57 +7,56 @@ import Accordion from "react-bootstrap/Accordion";
 import Alert from "react-bootstrap/Alert";
 import SoundGroup from "./sound-group";
 
-class Amb extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      isLoggedIn: this.props.isLoggedIn,
-      isPlaying: false,
-      ambName: '',
-      ambOwner: '',
-      ambOwnerId: -1,
-      ambData: [],
-      showAlert: false,
-      alertMessage: ''
-    }
-  }
+function Amb(props) {
+  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [ambName, setAmbName] = useState('');
+  const [ambOwner, setAmbOwner] = useState('');
+  const [ambOwnerId, setAmbOwnerId] = useState(-1);
+  const [ambData, setAmbData] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
-  componentDidMount() {
+  useEffect(() => {
     console.log('Getting Amb data...');
-    fetch('http://localhost:3001/amb/'+this.props.ambId)
+    fetch('http://localhost:3001/amb/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
         return res.json();
       })
       .then((result) => {
-        this.setState({ ambName: result.ambName, ambOwner: result.ambOwner, ambOwnerId: result.ambOwnerId, ambData: result.ambData });
+        setAmbName(result.ambName);
+        setAmbOwner(result.ambOwner);
+        setAmbOwnerId(result.ambOwnerId);
+        setAmbData(result.ambData);
       })
       .catch(error => {
         console.error(error);
-        this.setState({ alertMessage: error.message, showAlert: true });
+        setAlertMessage(error.message);
+        setShowAlert(true);
       })
-  }
+  }, []);
 
-  renderSoundGroups() {
+  const renderSoundGroups = () => {
     return (
-      this.state.ambData.map((element, index) => {
+      ambData.map((element, index) => {
         return (
           <SoundGroup
-            key={`${this.props.ambId}+${element.groupId}`}
-            id={`${this.props.ambId}+${element.groupId}`}
+            key={`${props.ambId}+${element.groupId}`}
+            id={`${props.ambId}+${element.groupId}`}
             groupName={element.groupName}
             interval={element.interval}
             sounds={element.sounds}
-            isPlaying={this.state.isPlaying}
+            isPlaying={isPlaying}
           />
         )
       })
     );
   }
 
-  renderAlert() {
-    if(this.state.showAlert) {
+  const renderAlert = () => {
+    if(showAlert) {
       return (
         <Alert
           className="my-2"
@@ -65,7 +64,7 @@ class Amb extends React.Component {
         >
           <Row>
             <Col className="text-center">
-            {this.state.alertMessage}
+            {alertMessage}
             </Col>
           </Row>
         </Alert>
@@ -74,31 +73,31 @@ class Amb extends React.Component {
       return(
         <Row>
           <Row className="text-center mt-2">
-            <h6>By: {this.state.ambOwner}</h6>
+            <h6>By: {ambOwner}</h6>
           </Row>
           <Row className="mt-2">
             <Col className="text-end">
               <Button
-                onClick={() => this.props.toggleEdit()}
+                onClick={() => props.toggleEdit()}
               >
                 Edit
               </Button>
             </Col>
             <Col className="text-center">
               <Button
-                variant={this.state.isPlaying ? "success" : "warning"}
-                onClick={()=>this.setState({ isPlaying: !this.state.isPlaying })}
+                variant={isPlaying ? "success" : "warning"}
+                onClick={()=> setIsPlaying(!isPlaying)}
               >
                 Play
               </Button>
             </Col>
             <Col className="text-start">
-              <Button>Favorite</Button>
+              <Button variant="secondary" disabled>Favorite</Button>
             </Col>
           </Row>
           <Row>
             <Accordion>
-              {this.renderSoundGroups()}
+              {renderSoundGroups()}
             </Accordion>
           </Row>
         </Row>
@@ -106,17 +105,15 @@ class Amb extends React.Component {
     }
   }
 
-  render() {
-    return(
-      <Container>
-        <Row className="text-center mt-2">
-          <h2>{this.state.ambName}</h2>
-        </Row>
-        {this.renderAlert()}
+  return(
+    <Container>
+      <Row className="text-center mt-2">
+        <h2>{ambName}</h2>
+      </Row>
+      {renderAlert()}
 
-      </Container>
-    );
-  }
+    </Container>
+  );
 }
 
 export default Amb;
