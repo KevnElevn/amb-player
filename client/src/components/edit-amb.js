@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
 import EditSoundGroup from "./edit-sound-group";
 import SoundGroupModal from "./sound-group-modal";
 import { Navigate } from 'react-router-dom';
@@ -22,9 +23,12 @@ function EditAmb(props) {
   const [alertMessage, setAlertMessage] = useState('');
   const [exitPage, setExitPage] = useState(false);
 
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const { getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
     console.log("Getting Amb data...");
-    fetch('http://localhost:3001/amb/'+props.ambId)
+    fetch(serverUrl+'/amb/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -45,7 +49,7 @@ function EditAmb(props) {
 
   const getData = () => {
     console.log("Getting Amb data...");
-    fetch('http://localhost:3001/amb/'+props.ambId)
+    fetch(serverUrl+'/amb/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -64,16 +68,20 @@ function EditAmb(props) {
       })
   }
 
-  const putEditAmb = () => {
+  const putEditAmb = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           ambName: ambName,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -90,7 +98,8 @@ function EditAmb(props) {
         })
   }
 
-  const deleteAmb = () => {
+  const deleteAmb = async () => {
+    const token = await getAccessTokenSilently();
     if(ambData.length > 0) {
       this.setState({ showAlert: true, alertMessage: 'Amb must be empty to delete!' });
       setAlertMessage('Amb must be empty to delete!');
@@ -99,12 +108,15 @@ function EditAmb(props) {
     }
     const requestOptions = {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

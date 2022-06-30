@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
@@ -14,6 +15,9 @@ function SoundGroupModal(props) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const { getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
     if(props.edit) {
       setGroupName(props.groupName);
@@ -22,17 +26,21 @@ function SoundGroupModal(props) {
     }
   }, [props])
 
-  const postNewGroup = () => {
+  const postNewGroup = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           groupName: groupName,
-          interval: { from: intervalFrom, to: intervalTo },
+          interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
       };
-      fetch('http://localhost:3001/amb/'+props.ambId, requestOptions)
+      fetch(serverUrl+'/amb/'+props.ambId, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -50,17 +58,21 @@ function SoundGroupModal(props) {
         })
   }
 
-  const putEditGroup = () => {
+  const putEditGroup = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           groupName: groupName,
-          interval: { from: intervalFrom, to: intervalTo },
+          interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
-      };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      }; console.log(requestOptions);
+      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -78,20 +90,24 @@ function SoundGroupModal(props) {
         })
   }
 
-  const deleteSoundGroup = () => {
+  const deleteSoundGroup = async () => {
     if(props.soundsLength > 0) {
       setAlertMessage('Sound group must be empty to delete!');
       setShowAlert(true);
       return;
     }
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

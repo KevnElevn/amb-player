@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
@@ -18,6 +19,10 @@ function SoundElementModal(props) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const { getAccessTokenSilently } = useAuth0();
+
+
   useEffect(() => {
     if(props.edit) {
       setSoundName(props.name);
@@ -30,10 +35,14 @@ function SoundElementModal(props) {
     }
   }, [props]);
 
-  const postNewSound = () => {
+  const postNewSound = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           soundName: soundName,
@@ -41,10 +50,10 @@ function SoundElementModal(props) {
           volume: soundVolume,
           start: startTime,
           end: endTime,
-          chain: { from: chainFrom, to: chainTo },
+          chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -62,10 +71,14 @@ function SoundElementModal(props) {
         })
   }
 
-  const putEditSound = () => {
+  const putEditSound = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           soundName: soundName,
@@ -73,10 +86,10 @@ function SoundElementModal(props) {
           volume: soundVolume,
           start: startTime,
           end: endTime,
-          chain: { from: chainFrom, to: chainTo },
+          chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -94,15 +107,19 @@ function SoundElementModal(props) {
         })
   }
 
-  const deleteSoundElement = () => {
+  const deleteSoundElement = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
         })
       };
-      fetch(`http://localhost:3001/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

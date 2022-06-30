@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth0 } from '@auth0/auth0-react';
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
@@ -10,16 +11,24 @@ function AmbModal(props) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  const postNewAmb = () => {
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const { getAccessTokenSilently } = useAuth0();
+
+
+  const postNewAmb = async () => {
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: props.userId,
           ambName: ambName,
         })
       };
-      fetch('http://localhost:3001/amb/', requestOptions)
+      fetch(serverUrl+'/amb/', requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

@@ -17,9 +17,11 @@ function Amb(props) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+
   useEffect(() => {
     console.log('Getting Amb data...');
-    fetch('http://localhost:3001/amb/'+props.ambId)
+    fetch(serverUrl+'/amb/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');

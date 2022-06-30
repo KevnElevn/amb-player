@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   Routes,
@@ -18,7 +18,7 @@ import AmbPage from "./routes/amb-page";
 
 function App() {
   const { isAuthenticated } = useAuth0();
-  const [userId, setUserId] = useState(-1);
+  const [userId, setUserId] = useState(1);
 
   return (
     <>

@@ -9,9 +9,11 @@ function BrowsePage(props) {
   const [ambList, setAmbList] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+
   useEffect(() => {
     console.log("Getting Ambs list...");
-    fetch("http://localhost:3001/browse")
+    fetch(serverUrl+"/browse")
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');

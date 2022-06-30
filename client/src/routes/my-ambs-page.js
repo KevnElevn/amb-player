@@ -12,10 +12,11 @@ function MyAmbsPage(props) {
   const [showAmbModal, setShowAmbModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
 
   const getData = () => {
     console.log("Getting Ambs list...");
-    fetch("http://localhost:3001/browse/?user="+props.userId)
+    fetch(serverUrl+"/browse/?user="+props.userId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -32,8 +33,22 @@ function MyAmbsPage(props) {
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    console.log("Getting Ambs list...");
+    fetch(serverUrl+"/browse/?user="+props.userId)
+      .then(res => {
+        if(res.status >= 400)
+          throw new Error('Server error!');
+        return res.json();
+      })
+      .then(result => {
+        setMyAmbsList(result);
+      })
+      .catch(error => {
+        console.error(error);
+        setAlertMessage(error.message);
+        setShowAlert(true);
+      })
+  }, [props.userId]);
 
   const renderAlert = () => {
     if(showAlert) {

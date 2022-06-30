@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db.js');
+const { auth } = require('express-oauth2-jwt-bearer');
+
+const checkJwt = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: 'https://'+process.env.AUTH0_DOMAIN,
+});
 
 router.get('/:ambId', (req, res, next) => {
   console.log("GET /amb/"+req.params.ambId);
@@ -64,7 +70,7 @@ router.get('/:ambId', (req, res, next) => {
     });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.ambName === 'string'
   ) {
@@ -96,7 +102,7 @@ router.post('/', (req, res, next) => {
   }
 });
 
-router.post('/:ambId', (req, res, next) => {
+router.post('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.groupName === 'string' &&
     Number.isInteger(req.body.interval.from) &&
@@ -132,7 +138,7 @@ router.post('/:ambId', (req, res, next) => {
   }
 });
 
-router.post('/:ambId/:groupId', (req, res, next) => {
+router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.soundName === 'string' &&
     typeof req.body.url === 'string' &&
@@ -166,12 +172,12 @@ router.post('/:ambId/:groupId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.delete('/:ambId', (req, res, next) => {
+router.delete('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
       req.params.ambId > 0
   ) {
@@ -208,12 +214,12 @@ router.delete('/:ambId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       })
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.delete('/:ambId/:groupId', (req, res, next) => {
+router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.groupId > 0 &&
     req.params.ambId > 0
@@ -249,12 +255,12 @@ router.delete('/:ambId/:groupId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
+router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
     req.params.groupId > 0 &&
@@ -283,12 +289,12 @@ router.delete('/:ambId/:groupId/:soundId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.put('/:ambId', (req, res, next) => {
+router.put('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
     typeof req.body.ambName == 'string'
@@ -316,12 +322,12 @@ router.put('/:ambId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.put('/:ambId/:groupId', (req, res, next) => {
+router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
     req.params.groupId > 0 &&
@@ -353,12 +359,12 @@ router.put('/:ambId/:groupId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
 
-router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
+router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
     req.params.groupId > 0 &&
@@ -396,7 +402,7 @@ router.put('/:ambId/:groupId/:soundId', (req, res, next) => {
         res.status(500).send({ message: 'Something went wrong!' });
       });
   } else {
-    console.log("Bad input")
+    console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
