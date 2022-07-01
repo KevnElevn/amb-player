@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   Routes,
@@ -17,8 +17,42 @@ import MyAmbsPage from "./routes/my-ambs-page";
 import AmbPage from "./routes/amb-page";
 
 function App() {
-  const { isAuthenticated } = useAuth0();
-  const [userId, setUserId] = useState(1);
+  const [userId, setUserId] = useState(-1);
+
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
+  useEffect(() => {
+    const getUserId = async () => {
+    const token = await getAccessTokenSilently();
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    fetch(`${serverUrl}/user`, requestOptions)
+      .then(res => {
+        if(res.status >= 400)
+          throw new Error('Server error!');
+        return res.json();
+      })
+      .then((res) => { console.log(res.username, res.id);
+        setUserId(res.id);
+        console.log(`Logged in as user: ${res.username} with id: ${res.id}`);
+      })
+      .catch(error => {
+        console.error(error);
+      })
+    }
+    if(isAuthenticated) {
+      getUserId();
+    } else {
+      setUserId(-1);
+      console.log('Not logged in');
+    }
+  }, [isAuthenticated]);
 
   return (
     <>

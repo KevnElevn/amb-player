@@ -7,7 +7,6 @@ import Nav from 'react-bootstrap/Nav';
 
 function AuthenticationButtons() {
   const { isAuthenticated, isLoading } = useAuth0();
-  console.log('Authenticated: ', isAuthenticated);
   if(isLoading)
     return null;
   if(isAuthenticated) {
