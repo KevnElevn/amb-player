@@ -7,7 +7,7 @@ const checkJwt = auth({
   audience: process.env.AUTH0_AUDIENCE,
   issuerBaseURL: 'https://'+process.env.AUTH0_DOMAIN,
 });
-
+//Get Amb by ID
 router.get('/:ambId', (req, res, next) => {
   console.log("GET /amb/"+req.params.ambId);
   db.task (async t => {
@@ -69,19 +69,19 @@ router.get('/:ambId', (req, res, next) => {
       res.status(500).send({ message: 'Something went wrong!' });
     });
 });
-
+//Create new Amb
 router.post('/', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.ambName === 'string'
   ) {
     db.task(t => {
-      return t.one('SELECT id FROM users WHERE id = $1;', [req.body.userId])
+      return t.one('SELECT id FROM users WHERE id = $1 AND sub = $2;', [req.body.userId, req.auth.payload.sub])
         .then(user => {
           return t.one('INSERT INTO ambs (name, owner_id) VALUES ($1, $2) RETURNING id;', [req.body.ambName, req.body.userId])
         })
         .catch((error) => {
           console.log(error);
-          console.log("User doesn't exist");
+          console.log("Invalid user");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -101,7 +101,7 @@ router.post('/', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Create new group in Amb
 router.post('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.groupName === 'string' &&
@@ -110,10 +110,10 @@ router.post('/:ambId', checkJwt, (req, res, next) => {
     req.body.interval.to >= req.body.interval.from
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
-        .then(owned => {
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
           return t.one('INSERT INTO groups(amb_id, name, interval_from, interval_to) VALUES ($1, $2, $3, $4) RETURNING amb_id, group_id;',
-          [req.params.ambId, req.body.groupName, req.body.interval.from, req.body.interval.to])
+          [ambData.amb_id, req.body.groupName, req.body.interval.from, req.body.interval.to])
         })
         .catch((error) => {
           console.log(error);
@@ -137,7 +137,7 @@ router.post('/:ambId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Create new sound in group
 router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     typeof req.body.soundName === 'string' &&
@@ -149,14 +149,22 @@ router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
     Number.isInteger(req.body.chain.to)
   ) {
     db.task(t => {
-      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
-        .then(owned => {
-          return t.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING amb_id, group_id, sound_id;',
-          [req.params.ambId, req.params.groupId, req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('SELECT group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [ambData.amb_id, ambData.user_id, req.params.groupId])
+            .then(groupData => {
+              return t.one('INSERT INTO sounds(amb_id, group_id, name, url, volume, time_start, time_end, chain_from, chain_to) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING amb_id, group_id, sound_id;',
+              [ambData.amb_id, groupData.group_id, req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to])
+            })
+            .catch((error) => {
+              console.log(error);
+              console.log("User not owner or Amb/group not found");
+              res.status(500).send({ message: 'Something went wrong!' });
+            });
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner or Amb/group not found");
+          console.log("User not owner or Amb not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -176,31 +184,29 @@ router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Delete Amb
 router.delete('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
       req.params.ambId > 0
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
-        .then((amb) => {
-          return t.none('SELECT group_id FROM groups WHERE amb_id = $1;', [amb.id])
-            .then((groups) => {
-              if(!groups) {
-                return t.one('DELETE FROM ambs WHERE id = $1 AND owner_id = $2 RETURNING id;', [amb.id, req.body.userId])
-              }
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then((ambData) => {
+          return t.none('SELECT group_id FROM groups WHERE amb_id = $1;', [ambData.amb_id])
+            .then(() => {
+                return t.one('DELETE FROM ambs WHERE id = $1 AND owner_id = $2 RETURNING id;', [ambData.amb_id, ambData.user_id])
             })
             .catch((error) => {
               console.log(error);
               console.log('Amb not empty');
               res.status(500).send({ message: 'Something went wrong!' });
-            })
+            });
         })
         .catch((error) => {
           console.log(error);
           console.log('Amb not found or user not owner');
           res.status(500).send({ message: 'Something went wrong!' });
-        })
+        });
     })
       .then((result) => {
         if(result) {
@@ -212,34 +218,42 @@ router.delete('/:ambId', checkJwt, (req, res, next) => {
         console.log(error);
         console.log('Could not delete Amb');
         res.status(500).send({ message: 'Something went wrong!' });
-      })
+      });
   } else {
     console.log("Bad input");
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Delete sound group in Amb
 router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.groupId > 0 &&
     req.params.ambId > 0
   ) {
     db.task(t => {
-      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
-        .then(owned => {
-          return t.none('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, req.params.groupId])
-            .then(empty => {
-              return t.one('DELETE FROM groups WHERE amb_id = $1 AND group_id = $2 RETURNING amb_id, group_id;', [req.params.ambId, req.params.groupId])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('SELECT amb_id, group_id FROM groups WHERE amb_id = $1 AND group_id = $2;', [ambData.amb_id, req.params.groupId])
+            .then(groupData => {
+              return t.none('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2;', [groupData.amb_id, groupData.group_id])
+                .then(() => {
+                  return t.one('DELETE FROM groups WHERE amb_id = $1 AND group_id = $2 RETURNING amb_id, group_id;', [groupData.amb_id, groupData.group_id])
+                })
+                .catch((error) => {
+                  console.log(error);
+                  console.log('Sound group not empty');
+                  res.status(500).send({ message: 'Something went wrong!' });
+                });
             })
             .catch((error) => {
               console.log(error);
-              console.log('Sound group not empty');
+              console.log("Group not found");
               res.status(500).send({ message: 'Something went wrong!' });
-            })
+            });
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner or Amb/group not found");
+          console.log('Amb not found or user not owner');
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -259,7 +273,7 @@ router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Delete sound from group
 router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
@@ -267,13 +281,21 @@ router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
     req.params.soundId > 0
   ) {
     db.task(t => {
-      return t.one('SELECT ambs.owner_id, sounds.amb_id, sounds.group_id, sounds.sound_id FROM ambs JOIN sounds ON ambs.id = sounds.amb_id WHERE sounds.amb_id = $1 AND sounds.group_id = $2 AND sounds.sound_id = $3 AND ambs.owner_id = $4;', [req.params.ambId, req.params.groupId, req.params.soundId, req.body.userId])
-        .then(owned => {
-          return t.one('DELETE FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3 RETURNING amb_id, group_id, sound_id;', [req.params.ambId, req.params.groupId, req.params.soundId])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3', [ambData.amb_id, req.params.groupId, req.params.soundId])
+            .then(soundData => {
+              return t.one('DELETE FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3 RETURNING amb_id, group_id, sound_id;', [soundData.amb_id, soundData.group_id, soundData.sound_id])
+            })
+            .catch((error) => {
+              console.log(error);
+              console.log('Sound not found');
+              res.status(500).send({ message: 'Something went wrong!' });
+            });
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner or Amb/group/sound not found");
+          console.log('Amb not found or user not owner');
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -293,20 +315,20 @@ router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Edit Amb
 router.put('/:ambId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
     typeof req.body.ambName == 'string'
   ) {
     db.task(t => {
-      return t.one('SELECT id, owner_id FROM ambs WHERE id = $1 AND owner_id = $2;', [req.params.ambId, req.body.userId])
-        .then(amb => {
-          return t.one('UPDATE ambs SET name = $1 WHERE id = $2 AND owner_id = $3 RETURNING id, name;', [req.body.ambName, req.params.ambId, req.body.userId])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('UPDATE ambs SET name = $1 WHERE id = $2 AND owner_id = $3 RETURNING id, name;', [req.body.ambName, ambData.amb_id, ambData.user_id])
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner");
+          console.log("User not owner or Amb not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -326,7 +348,7 @@ router.put('/:ambId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Edit group
 router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
@@ -336,14 +358,22 @@ router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
     req.body.interval.to >= req.body.interval.from
   ) {
     db.task(t => {
-      return t.one('SELECT ambs.id, ambs.owner_id, groups.group_id FROM ambs JOIN groups ON ambs.id = groups.amb_id WHERE ambs.id = $1 AND ambs.owner_id = $2 AND groups.group_id = $3;', [req.params.ambId, req.body.userId, req.params.groupId])
-        .then(owned => {
-          return t.one('UPDATE groups SET name = $1, interval_from = $2, interval_to = $3 WHERE amb_id = $4 AND group_id = $5 RETURNING amb_id, group_id;',
-          [req.body.groupName, req.body.interval.from, req.body.interval.to, req.params.ambId, req.params.groupId])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('SELECT amb_id, group_id FROM groups WHERE amb_id = $1 AND group_id = $2', [ambData.amb_id, req.params.groupId])
+            .then(groupData => {
+              return t.one('UPDATE groups SET name = $1, interval_from = $2, interval_to = $3 WHERE amb_id = $4 AND group_id = $5 RETURNING amb_id, group_id;',
+              [req.body.groupName, req.body.interval.from, req.body.interval.to, groupData.amb_id, groupData.group_id])
+            })
+            .catch((error) => {
+              console.log(error);
+              console.log('Group not found');
+              res.status(500).send({ message: 'Something went wrong!' });
+            });
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner or Amb/group not found");
+          console.log("User not owner or Amb not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })
@@ -363,7 +393,7 @@ router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
     res.status(500).send({ message: 'Something went wrong!' });
   }
 });
-
+//Edit sound
 router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
   if(req.body.userId > 0 &&
     req.params.ambId > 0 &&
@@ -379,14 +409,22 @@ router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
     req.body.chain.to >= req.body.chain.from
   ) {
     db.task(t => {
-      return t.one('SELECT ambs.owner_id, sounds.amb_id, sounds.group_id, sounds.sound_id FROM ambs JOIN sounds ON ambs.id = sounds.amb_id WHERE sounds.amb_id = $1 AND sounds.group_id = $2 AND sounds.sound_id = $3 AND ambs.owner_id = $4;', [req.params.ambId, req.params.groupId, req.params.soundId, req.body.userId])
-        .then(owned => {
-          return t.one('UPDATE sounds SET name = $1, url = $2, volume = $3, time_start = $4, time_end = $5, chain_from = $6, chain_to = $7 WHERE amb_id = $8 AND group_id = $9 AND sound_id = $10 RETURNING sounds.amb_id, sounds.group_id, sounds.sound_id;',
-          [req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to, req.params.ambId, req.params.groupId, req.params.soundId])
+      return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
+        .then(ambData => {
+          return t.one('SELECT amb_id, group_id, sound_id FROM sounds WHERE amb_id = $1 AND group_id = $2 AND sound_id = $3;', [ambData.amb_id, req.params.groupId, req.params.soundId])
+            .then(soundData => {
+              return t.one('UPDATE sounds SET name = $1, url = $2, volume = $3, time_start = $4, time_end = $5, chain_from = $6, chain_to = $7 WHERE amb_id = $8 AND group_id = $9 AND sound_id = $10 RETURNING sounds.amb_id, sounds.group_id, sounds.sound_id;',
+              [req.body.soundName, req.body.url, req.body.volume, req.body.start, req.body.end, req.body.chain.from, req.body.chain.to, soundData.amb_id, soundData.group_id, soundData.sound_id])
+            })
+            .catch((error) => {
+              console.log(error);
+              console.log('Sound not found');
+              res.status(500).send({ message: 'Something went wrong!' });
+            });
         })
         .catch((error) => {
           console.log(error);
-          console.log("User not owner or Amb/group/sound not found");
+          console.log("User not owner or Amb not found");
           res.status(500).send({ message: 'Something went wrong!' });
         });
     })

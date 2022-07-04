@@ -99,13 +99,12 @@ function EditAmb(props) {
   }
 
   const deleteAmb = async () => {
-    const token = await getAccessTokenSilently();
     if(ambData.length > 0) {
-      this.setState({ showAlert: true, alertMessage: 'Amb must be empty to delete!' });
       setAlertMessage('Amb must be empty to delete!');
       setShowAlert(true);
       return;
     }
+    const token = await getAccessTokenSilently();
     const requestOptions = {
         method: 'DELETE',
         headers: {
