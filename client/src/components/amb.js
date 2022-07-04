@@ -8,7 +8,6 @@ import Alert from "react-bootstrap/Alert";
 import SoundGroup from "./sound-group";
 
 function Amb(props) {
-  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
   const [isPlaying, setIsPlaying] = useState(false);
   const [ambName, setAmbName] = useState('');
   const [ambOwner, setAmbOwner] = useState('');
@@ -38,7 +37,7 @@ function Amb(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, []);
+  }, [props.ambId, serverUrl]);
 
   const renderSoundGroups = () => {
     return (
@@ -80,6 +79,8 @@ function Amb(props) {
           <Row className="mt-2">
             <Col className="text-end">
               <Button
+                disabled={props.userId === ambOwnerId ? false : true}
+                variant={props.userId === ambOwnerId ? "primary" : "secondary"}
                 onClick={() => props.toggleEdit()}
               >
                 Edit

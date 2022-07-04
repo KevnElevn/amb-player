@@ -52,7 +52,7 @@ function App() {
       setUserId(-1);
       console.log('Not logged in');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, getAccessTokenSilently, serverUrl]);
 
   return (
     <>

@@ -12,10 +12,8 @@ import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
 
 function EditAmb(props) {
-  const [isLoggedIn, setIsLoggedIn] = useState(props.isLoggedIn);
   const [ambName, setAmbName] = useState('');
   const [ambOwner, setAmbOwner] = useState('');
-  const [ambOwnerId, setAmbOwnerId] = useState(-1);
   const [ambData, setAmbData] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -37,7 +35,6 @@ function EditAmb(props) {
       .then((result) => {
         setAmbName(result.ambName);
         setAmbOwner(result.ambOwner);
-        setAmbOwnerId(result.ambOwnerId);
         setAmbData(result.ambData);
       })
       .catch(error => {
@@ -45,7 +42,7 @@ function EditAmb(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, []);
+  }, [props.ambId, serverUrl]);
 
   const getData = () => {
     console.log("Getting Amb data...");
@@ -58,7 +55,6 @@ function EditAmb(props) {
       .then((result) => {
         setAmbName(result.ambName);
         setAmbOwner(result.ambOwner);
-        setAmbOwnerId(result.ambOwnerId);
         setAmbData(result.ambData);
       })
       .catch(error => {
