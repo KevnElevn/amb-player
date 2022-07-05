@@ -48,7 +48,7 @@ function MyAmbsPage(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, [props.userId]);
+  }, [props.userId, serverUrl]);
 
   const renderAlert = () => {
     if(showAlert) {

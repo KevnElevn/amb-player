@@ -27,7 +27,7 @@ function BrowsePage(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, [props]);
+  }, [props, serverUrl]);
 
   const renderAlert = () => {
     if(showAlert) {
