@@ -11,13 +11,15 @@ const browse = require('./routes/browse-route.js');
 
 app.use(cors());
 app.use(bodyParser.json());
+if(process.env.NODE_ENV === 'production') {
+  app.use(express.static('../client/build'));
+}
 
 app.use('/user', user);
 app.use('/amb', amb);
 app.use('/browse', browse);
 
 if(process.env.NODE_ENV === 'production') {
-  app.use(express.static('../client/build'));
   app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   });
