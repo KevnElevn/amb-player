@@ -11,7 +11,7 @@ const browse = require('./routes/browse-route.js');
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('../client/build'));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 app.use('/user', user);
 app.use('/amb', amb);
