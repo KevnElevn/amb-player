@@ -1,6 +1,6 @@
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username TEXT UNIQUE CHECK (char_length(username) <= 64)
+  username TEXT UNIQUE CHECK (char_length(username) <= 64),
   sub TEXT UNIQUE
 );
 
@@ -13,7 +13,7 @@ CREATE TABLE ambs (
 CREATE TABLE groups (
   amb_id INT REFERENCES ambs (id),
   group_id SERIAL NOT NULL,
-  FOREIGN KEY (amb_id) REFERENCES groups (amb_id),
+  FOREIGN KEY (amb_id) REFERENCES ambs (id),
   PRIMARY KEY (amb_id, group_id),
   name TEXT CHECK (char_length(name) <= 256),
   interval_from INT CHECK (interval_from >= 0 AND interval_from < 2000000000),
