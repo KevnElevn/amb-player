@@ -12,11 +12,6 @@ const browse = require('./routes/browse-route.js');
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get("/", (req, res  ) => {
-  console.log('GET /');
-  res.send('Hello World!');
-});
-
 app.use('/user', user);
 app.use('/amb', amb);
 app.use('/browse', browse);

@@ -1,6 +1,6 @@
-# AmbienceGen
+# AmbPlayer
 ## What is this?
-AmbienceGen is a web application where users can combine the audio components of media to create dynamic soundscapes. Users can create experiences unlike prerecorded audio, which are the same every playback, by organizing sounds into groups that play at fixed or variable intervals.
+AmbPlayer is a web application where users can combine the audio components of media to create dynamic soundscapes. Users can create experiences unlike prerecorded audio, which are the same every playback, by organizing sounds into groups that play at fixed or variable intervals.
 
 ## Amb
 An Amb is a collection of data that defines and configures the soundscape. They contain the following:
