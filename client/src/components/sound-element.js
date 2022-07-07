@@ -40,7 +40,7 @@ function SoundElement(props){
           url={props.url}
           volume={playerVolume/100}
           playing={props.isPlaying}
-          controls={true}
+          controls={false}
           config={{
             youtube: {
               playerVars: {
@@ -60,8 +60,8 @@ function SoundElement(props){
               props.onFinish();
             }
           }}
-          width="100%"
-          height="100px"
+          width="0px"
+          height="0px"
          />
        </Row>
      </Row>

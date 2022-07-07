@@ -40,6 +40,7 @@ function SoundGroup(props){
       <Accordion.Item eventKey={props.id}>
         <Accordion.Header>
           <Col className="overflow-auto">{props.groupName}</Col>
+          <Col className="text-end me-3">{props.interval.from} ~ {props.interval.to}</Col>
         </Accordion.Header>
         <Accordion.Body>
           <Button

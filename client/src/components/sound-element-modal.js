@@ -60,7 +60,7 @@ function SoundElementModal(props) {
           return res.json();
         })
         .then((res) => {
-          console.log("Created sound " + res.soundId + " for group " + props.groupId);
+          console.log(`Created sound ${res.sound_id} for group ${res.group_id} in Amb #${res.amb_id}`);
           props.refresh();
           props.handleClose();
         })
