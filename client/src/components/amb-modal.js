@@ -24,11 +24,11 @@ function AmbModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           ambName: ambName,
         })
       };
-      fetch(serverUrl+'/amb/', requestOptions)
+      fetch(serverUrl+'/ambs/', requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

@@ -26,7 +26,7 @@ function EditAmb(props) {
 
   useEffect(() => {
     console.log("Getting Amb data...");
-    fetch(serverUrl+'/amb/'+props.ambId)
+    fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -46,7 +46,7 @@ function EditAmb(props) {
 
   const getData = () => {
     console.log("Getting Amb data...");
-    fetch(serverUrl+'/amb/'+props.ambId)
+    fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -73,11 +73,11 @@ function EditAmb(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           ambName: ambName,
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -108,10 +108,10 @@ function EditAmb(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

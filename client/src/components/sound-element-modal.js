@@ -44,23 +44,23 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           soundName: soundName,
           url: soundUrl,
-          volume: soundVolume,
-          start: startTime,
-          end: endTime,
+          volume: Number(soundVolume),
+          start: Number(startTime),
+          end: Number(endTime),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
           return res.json();
         })
         .then((res) => {
-          console.log("Created sound " + res.soundId + " for group " + props.groupId);
+          console.log(`Created sound ${res.sound_id} for group ${res.group_id} in Amb #${res.amb_id}`);
           props.refresh();
           props.handleClose();
         })
@@ -80,16 +80,16 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           soundName: soundName,
           url: soundUrl,
-          volume: soundVolume,
-          start: startTime,
-          end: endTime,
+          volume: Number(soundVolume),
+          start: Number(startTime),
+          end: Number(endTime),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -116,10 +116,10 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

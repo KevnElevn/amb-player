@@ -20,7 +20,7 @@ function Amb(props) {
 
   useEffect(() => {
     console.log('Getting Amb data...');
-    fetch(serverUrl+'/amb/'+props.ambId)
+    fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
