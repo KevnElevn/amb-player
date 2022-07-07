@@ -1,6 +1,8 @@
+CREATE SEQUENCE users_username_seq START 1;
+
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  username TEXT UNIQUE CHECK (char_length(username) <= 64),
+  username TEXT UNIQUE CHECK (char_length(username) <= 64) DEFAULT CAST(nextval('users_username_seq') AS TEXT),
   sub TEXT UNIQUE
 );
 

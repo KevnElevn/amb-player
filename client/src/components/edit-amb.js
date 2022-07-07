@@ -73,7 +73,7 @@ function EditAmb(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           ambName: ambName,
         })
       };
@@ -108,7 +108,7 @@ function EditAmb(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
         })
       };
       fetch(`${serverUrl}/amb/${props.ambId}`, requestOptions)

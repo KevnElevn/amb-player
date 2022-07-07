@@ -44,12 +44,12 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           soundName: soundName,
           url: soundUrl,
-          volume: soundVolume,
-          start: startTime,
-          end: endTime,
+          volume: Number(soundVolume),
+          start: Number(startTime),
+          end: Number(endTime),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
@@ -80,12 +80,12 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           soundName: soundName,
           url: soundUrl,
-          volume: soundVolume,
-          start: startTime,
-          end: endTime,
+          volume: Number(soundVolume),
+          start: Number(startTime),
+          end: Number(endTime),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
@@ -116,7 +116,7 @@ function SoundElementModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
         })
       };
       fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)

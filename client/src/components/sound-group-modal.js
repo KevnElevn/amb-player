@@ -35,7 +35,7 @@ function SoundGroupModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           groupName: groupName,
           interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
@@ -67,7 +67,7 @@ function SoundGroupModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           groupName: groupName,
           interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
@@ -104,7 +104,7 @@ function SoundGroupModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
         })
       };
       fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)

@@ -24,7 +24,7 @@ function AmbModal(props) {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: props.userId,
+          userId: Number(props.userId),
           ambName: ambName,
         })
       };
