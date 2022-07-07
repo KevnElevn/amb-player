@@ -53,7 +53,7 @@ function SoundElementModal(props) {
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -89,7 +89,7 @@ function SoundElementModal(props) {
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -119,7 +119,7 @@ function SoundElementModal(props) {
           userId: Number(props.userId),
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

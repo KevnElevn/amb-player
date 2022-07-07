@@ -13,7 +13,7 @@ function BrowsePage(props) {
 
   useEffect(() => {
     console.log("Getting Ambs list...");
-    fetch(serverUrl+"/browse")
+    fetch(serverUrl+"/directory")
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');

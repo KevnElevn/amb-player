@@ -9,7 +9,7 @@ const checkJwt = auth({
 });
 //Get Amb by ID
 router.get('/:ambId', (req, res, next) => {
-  console.log("GET /amb/"+req.params.ambId);
+  console.log("GET /ambs/"+req.params.ambId);
   db.task (async t => {
     let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr;
     try {

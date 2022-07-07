@@ -40,7 +40,7 @@ function SoundGroupModal(props) {
           interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
       };
-      fetch(serverUrl+'/amb/'+props.ambId, requestOptions)
+      fetch(serverUrl+'/ambs/'+props.ambId, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -72,7 +72,7 @@ function SoundGroupModal(props) {
           interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
       }; console.log(requestOptions);
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');
@@ -107,7 +107,7 @@ function SoundGroupModal(props) {
           userId: Number(props.userId),
         })
       };
-      fetch(`${serverUrl}/amb/${props.ambId}/${props.groupId}`, requestOptions)
+      fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
             throw new Error('Server error!');

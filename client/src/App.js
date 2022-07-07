@@ -33,7 +33,7 @@ function App() {
         Authorization: `Bearer ${token}`,
       },
     };
-    fetch(`${serverUrl}/user`, requestOptions)
+    fetch(`${serverUrl}/users`, requestOptions)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');

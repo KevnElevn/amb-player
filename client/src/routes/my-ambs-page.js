@@ -16,7 +16,7 @@ function MyAmbsPage(props) {
 
   const getData = () => {
     console.log("Getting Ambs list...");
-    fetch(serverUrl+"/browse/?user="+props.userId)
+    fetch(serverUrl+"/directory/?user="+props.userId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -34,7 +34,7 @@ function MyAmbsPage(props) {
 
   useEffect(() => {
     console.log("Getting Ambs list...");
-    fetch(serverUrl+"/browse/?user="+props.userId)
+    fetch(serverUrl+"/directory/?user="+props.userId)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
