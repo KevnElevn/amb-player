@@ -36,6 +36,7 @@ function AmbModal(props) {
         })
         .then((res) => {
           console.log("POST created new amb " + res.ambId);
+          setAmbName('New Amb');
           props.refresh();
           props.handleClose();
         })

@@ -49,7 +49,7 @@ function SoundElementModal(props) {
           url: soundUrl,
           volume: Number(soundVolume),
           start: Number(startTime),
-          end: Number(endTime),
+          end: Math.max(Number(endTime), -1),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };
@@ -61,6 +61,13 @@ function SoundElementModal(props) {
         })
         .then((res) => {
           console.log(`Created sound ${res.sound_id} for group ${res.group_id} in Amb #${res.amb_id}`);
+          setSoundName('New Sound Element');
+          setSoundUrl('');
+          setSoundVolume(100);
+          setStartTime(0);
+          setEndTime(-1);
+          setChainFrom(0);
+          setChainTo(0);
           props.refresh();
           props.handleClose();
         })
@@ -85,7 +92,7 @@ function SoundElementModal(props) {
           url: soundUrl,
           volume: Number(soundVolume),
           start: Number(startTime),
-          end: Number(endTime),
+          end: Math.max(Number(endTime), -1),
           chain: { from: Number(chainFrom), to: Number(chainTo) },
         })
       };

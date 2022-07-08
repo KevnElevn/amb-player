@@ -9,69 +9,74 @@ const checkJwt = auth({
 });
 //Get Amb by ID
 router.get('/:ambId', (req, res, next) => {
-  console.log("GET /ambs/"+req.params.ambId);
-  db.task (async t => {
-    let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr;
-    try {
-      ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1;', [req.params.ambId]);
-    } catch(error) {
-      throw error;
-    }
-    try {
-      groupInfo = await t.any('SELECT group_id, name, interval_from, interval_to FROM groups WHERE amb_id = $1;', [req.params.ambId]);
-    } catch(error) {
-      throw error;
-    }
-    try {
-      soundsQueries = groupInfo.map((group) => t.any('SELECT * FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, group.group_id]));
-    } catch(error) {
-      throw error;
-    }
-    try {
-      soundsArr = await t.batch(soundsQueries);
-    } catch(error) {
-      throw error;
-    }
-    groupsArr = groupInfo.map((group, index) => {
-      return {
-        groupName: group.name,
-        groupId: group.group_id,
-        interval: { from: group.interval_from, to: group.interval_to },
-        sounds: soundsArr[index].map((sound) => {
-          return {
-            name: sound.name,
-            id: sound.sound_id,
-            url: sound.url,
-            volume: sound.volume,
-            start: sound.time_start,
-            end: sound.time_end,
-            chain: { from: sound.chain_from, to: sound.chain_to },
-          }
-        }),
+  if(Number(req.params.ambId) > 0) {
+    console.log("GET /ambs/"+req.params.ambId);
+    db.task (async t => {
+      let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr;
+      try {
+        ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1;', [req.params.ambId]);
+      } catch(error) {
+        throw error;
       }
-    });
-    return ambObj = {
-      ambId: req.params.ambId,
-      ambName: ambInfo.name,
-      ambOwner: ambInfo.owner_name,
-      ambOwnerId: ambInfo.owner_id,
-      ambData: groupsArr,
-    };
-  })
-    .then((ambObj) => {
-      if(ambObj) {
-        console.log("Success");
-        res.send(ambObj);
+      try {
+        groupInfo = await t.any('SELECT group_id, name, interval_from, interval_to FROM groups WHERE amb_id = $1;', [req.params.ambId]);
+      } catch(error) {
+        throw error;
       }
+      try {
+        soundsQueries = groupInfo.map((group) => t.any('SELECT * FROM sounds WHERE amb_id = $1 AND group_id = $2;', [req.params.ambId, group.group_id]));
+      } catch(error) {
+        throw error;
+      }
+      try {
+        soundsArr = await t.batch(soundsQueries);
+      } catch(error) {
+        throw error;
+      }
+      groupsArr = groupInfo.map((group, index) => {
+        return {
+          groupName: group.name,
+          groupId: group.group_id,
+          interval: { from: group.interval_from, to: group.interval_to },
+          sounds: soundsArr[index].map((sound) => {
+            return {
+              name: sound.name,
+              id: sound.sound_id,
+              url: sound.url,
+              volume: sound.volume,
+              start: sound.time_start,
+              end: sound.time_end,
+              chain: { from: sound.chain_from, to: sound.chain_to },
+            }
+          }),
+        }
+      });
+      return ambObj = {
+        ambId: req.params.ambId,
+        ambName: ambInfo.name,
+        ambOwner: ambInfo.owner_name,
+        ambOwnerId: ambInfo.owner_id,
+        ambData: groupsArr,
+      };
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send({ message: 'Something went wrong!' });
-    });
+      .then((ambObj) => {
+        if(ambObj) {
+          console.log("Success");
+          res.send(ambObj);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+    } else {
+      console.log('Bad input');
+      res.status(500).send({ message: 'Something went wrong! '});
+    }
 });
 //Create new Amb
 router.post('/', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
+  if(Number(req.body.userId) > 0 &&
     typeof req.body.ambName === 'string'
   ) {
     db.task(t => {
@@ -103,9 +108,11 @@ router.post('/', checkJwt, (req, res, next) => {
 });
 //Create new group in Amb
 router.post('/:ambId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.ambId) > 0 &&
     typeof req.body.groupName === 'string' &&
     Number.isInteger(req.body.interval.from) &&
+    req.body.interval.from >= 0 &&
     Number.isInteger(req.body.interval.to) &&
     req.body.interval.to >= req.body.interval.from
   ) {
@@ -139,14 +146,22 @@ router.post('/:ambId', checkJwt, (req, res, next) => {
 });
 //Create new sound in group
 router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.ambId) > 0 &&
+    Number(req.params.groupId) > 0 &&
     typeof req.body.soundName === 'string' &&
     typeof req.body.url === 'string' &&
     Number.isInteger(req.body.volume) &&
+    req.body.volume >= 0 &&
+    req.body.volume <= 100 &&
     Number.isInteger(req.body.start) &&
+    req.body.start >= 0 &&
     Number.isInteger(req.body.end) &&
+    req.body.end >= -1 &&
     Number.isInteger(req.body.chain.from) &&
-    Number.isInteger(req.body.chain.to)
+    req.body.chain.from >= 0 &&
+    Number.isInteger(req.body.chain.to) &&
+    req.body.chain.to >= req.body.chain.from
   ) {
     db.task(t => {
       return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
@@ -186,8 +201,8 @@ router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
 });
 //Delete Amb
 router.delete('/:ambId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-      req.params.ambId > 0
+  if(Number(req.body.userId) > 0 &&
+      Number(req.params.ambId) > 0
   ) {
     db.task(t => {
       return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
@@ -226,9 +241,9 @@ router.delete('/:ambId', checkJwt, (req, res, next) => {
 });
 //Delete sound group in Amb
 router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-    req.params.groupId > 0 &&
-    req.params.ambId > 0
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.groupId) > 0 &&
+    Number(req.params.ambId) > 0
   ) {
     db.task(t => {
       return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
@@ -275,10 +290,10 @@ router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
 });
 //Delete sound from group
 router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-    req.params.ambId > 0 &&
-    req.params.groupId > 0 &&
-    req.params.soundId > 0
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.ambId) > 0 &&
+    Number(req.params.groupId) > 0 &&
+    Number(req.params.soundId) > 0
   ) {
     db.task(t => {
       return t.one('SELECT users.id AS user_id, ambs.id AS amb_id FROM users JOIN ambs ON users.id = ambs.owner_id WHERE ambs.id = $1 AND users.id = $2 AND users.sub = $3;', [req.params.ambId, req.body.userId, req.auth.payload.sub])
@@ -317,8 +332,8 @@ router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
 });
 //Edit Amb
 router.put('/:ambId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-    req.params.ambId > 0 &&
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.ambId) > 0 &&
     typeof req.body.ambName == 'string'
   ) {
     db.task(t => {
@@ -350,11 +365,13 @@ router.put('/:ambId', checkJwt, (req, res, next) => {
 });
 //Edit group
 router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-    req.params.ambId > 0 &&
-    req.params.groupId > 0 &&
+  if(Number(req.body.userId )> 0 &&
+    Number(req.params.ambId )> 0 &&
+    Number(req.params.groupId) > 0 &&
     typeof req.body.groupName === 'string' &&
+    Number.isInteger(req.body.interval.from) &&
     req.body.interval.from >= 0 &&
+    Number.isInteger(req.body.interval.to) &&
     req.body.interval.to >= req.body.interval.from
   ) {
     db.task(t => {
@@ -395,17 +412,22 @@ router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
 });
 //Edit sound
 router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
-  if(req.body.userId > 0 &&
-    req.params.ambId > 0 &&
-    req.params.groupId > 0 &&
-    req.params.soundId > 0 &&
+  if(Number(req.body.userId) > 0 &&
+    Number(req.params.ambId) > 0 &&
+    Number(req.params.groupId) > 0 &&
+    Number(req.params.soundId) > 0 &&
     typeof req.body.soundName === 'string' &&
     typeof req.body.url === 'string' &&
+    Number.isInteger(req.body.volume) &&
     req.body.volume >= 0 &&
     req.body.volume <= 100 &&
+    Number.isInteger(req.body.start) &&
     req.body.start >= 0 &&
+    Number.isInteger(req.body.end) &&
     req.body.end >= -1 &&
+    Number.isInteger(req.body.chain.from) &&
     req.body.chain.from >= 0 &&
+    Number.isInteger(req.body.chain.to) &&
     req.body.chain.to >= req.body.chain.from
   ) {
     db.task(t => {

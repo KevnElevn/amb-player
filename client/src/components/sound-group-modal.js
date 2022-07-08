@@ -48,6 +48,9 @@ function SoundGroupModal(props) {
         })
         .then((res) => {
           console.log("Created new group " + res.group_id + "in Amb " + props.amb_id);
+          setGroupName('New Group');
+          setIntervalFrom(0);
+          setIntervalTo(0);
           props.refresh();
           props.handleClose();
         })
