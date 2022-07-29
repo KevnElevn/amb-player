@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Amb from "../components/amb";
 import EditAmb from "../components/edit-amb";
@@ -7,7 +7,17 @@ import Row from "react-bootstrap/Row";
 
 function AmbPage(props){
   const [editing, setEditing] = useState(false);
+  const [audioCtx] = useState(new AudioContext());
+  audioCtx.suspend();
+  console.log(audioCtx.state);
   let params = useParams();
+  useEffect(() => {
+    return () => {
+      console.log('cleanup');
+      audioCtx.close();
+    }
+  },[]);
+
   const renderAmb = () => {
     if(editing) {
       return (
@@ -23,6 +33,7 @@ function AmbPage(props){
           userId={props.userId}
           ambId={params.ambId}
           toggleEdit={() => setEditing(!editing)}
+          audioContext={audioCtx}
         />
       );
     }

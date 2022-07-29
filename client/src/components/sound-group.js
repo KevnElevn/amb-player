@@ -13,6 +13,7 @@ function SoundGroup(props){
       <SoundElement
         key={`${props.id}+${element.id}`}
         id={`${props.id}+${element.id}`}
+        audioContext={props.audioContext}
         name={element.name}
         url={element.url}
         volume={element.volume}

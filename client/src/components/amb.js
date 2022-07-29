@@ -19,6 +19,7 @@ function Amb(props) {
   const serverUrl = process.env.REACT_APP_SERVER_URL;
 
   useEffect(() => {
+    setIsPlaying(props.audioContext.state === 'running');
     console.log('Getting Amb data...');
     fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
@@ -46,6 +47,7 @@ function Amb(props) {
           <SoundGroup
             key={`${props.ambId}+${element.groupId}`}
             id={`${props.ambId}+${element.groupId}`}
+            audioContext={props.audioContext}
             groupName={element.groupName}
             interval={element.interval}
             sounds={element.sounds}
@@ -89,7 +91,16 @@ function Amb(props) {
             <Col className="text-center">
               <Button
                 variant={isPlaying ? "success" : "warning"}
-                onClick={()=> setIsPlaying(!isPlaying)}
+                onClick={()=> {
+                  if(props.audioContext.state === 'suspended')
+                    props.audioContext.resume().then(() =>
+                      setIsPlaying(props.audioContext.state === 'running')
+                    );
+                  else if(props.audioContext.state === 'running')
+                    props.audioContext.suspend().then(() =>
+                      setIsPlaying(props.audioContext.state === 'running')
+                    );
+                }}
               >
                 Play
               </Button>

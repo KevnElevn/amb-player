@@ -74,7 +74,7 @@ function SoundGroupModal(props) {
           groupName: groupName,
           interval: { from: Number(intervalFrom), to: Number(intervalTo) },
         })
-      }; console.log(requestOptions);
+      };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
           if(res.status >= 400)
