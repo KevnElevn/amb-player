@@ -14,8 +14,10 @@ import Nav from "react-bootstrap/Nav";
 import FrontPage from "./routes/front-page";
 import SearchPage from "./routes/search-page";
 import BrowsePage from "./routes/browse-page";
+import UsersPage from "./routes/users-page";
 import MyAmbsPage from "./routes/my-ambs-page";
 import AmbPage from "./routes/amb-page";
+import ProfilePage from "./routes/profile-page";
 
 function App() {
   const [userId, setUserId] = useState(-1);
@@ -33,7 +35,7 @@ function App() {
         Authorization: `Bearer ${token}`,
       },
     };
-    fetch(`${serverUrl}/users`, requestOptions)
+    fetch(`${serverUrl}/auth`, requestOptions)
       .then(res => {
         if(res.status >= 400)
           throw new Error('Server error!');
@@ -66,6 +68,9 @@ function App() {
           <Nav.Item>
               <Nav.Link as={NavLink} to="/browse">Browse</Nav.Link>
           </Nav.Item>
+          <Nav.Item>
+              <Nav.Link as={NavLink} to="/users">Users</Nav.Link>
+          </Nav.Item>
         </Nav>
         <AuthenticationButtons />
       </Navbar>
@@ -74,7 +79,9 @@ function App() {
         <Route path="myambs" element={<MyAmbsPage userId={userId} />} />
         <Route path="search" element={<SearchPage userId={userId} />} />
         <Route path="browse" element={<BrowsePage userId={userId} />} />
+        <Route path="users" element={<UsersPage userId={userId} />} />
         <Route path="amb/:ambId" element={<AmbPage userId={userId} />} />
+        <Route path="users/:userId" element={<ProfilePage userId={userId} />} />
         <Route path="*" element={<FrontPage />} />
       </Routes>
     </>

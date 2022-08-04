@@ -7,16 +7,18 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const users = require('./routes/users-route.js');
-const ambs = require('./routes/ambs-route.js');
-const directory = require('./routes/directory-route.js');
+const authRoute = require('./routes/auth-route.js');
+const usersRoute = require('./routes/users-route.js');
+const ambsRoute = require('./routes/ambs-route.js');
+const directoryRoute = require('./routes/directory-route.js');
 
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/users', users);
-app.use('/ambs', ambs);
-app.use('/directory', directory);
+app.use('/ambs', ambsRoute);
+app.use('/users', usersRoute);
+app.use('/directory', directoryRoute);
+app.use('/auth', authRoute);
 
 if(process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));

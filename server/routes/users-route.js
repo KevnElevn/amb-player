@@ -1,42 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db.js');
-const { auth } = require('express-oauth2-jwt-bearer');
 
-const checkJwt = auth({
-  audience: process.env.AUTH0_AUDIENCE,
-  issuerBaseURL: process.env.AUTH0_DOMAIN,
-});
-
-router.get('/', checkJwt, (req, res, next) => {
-  console.log(`GET /users/${req.auth.payload.sub}`);
-  db.task(t => {
-    return t.oneOrNone('SELECT id, username FROM users WHERE sub = $1', [req.auth.payload.sub])
-      .then(user => {
-        if(!user) {
-          return t.one('INSERT INTO users (sub) VALUES ($1) RETURNING id, username', [req.auth.payload.sub])
-            .then(newUser => {
-              console.log('Created new user');
-              return newUser;
-            })
-            .catch((error) => {
-              console.log('Failed to create new user');
-              console.log(error);
-              res.status(500).send({ message: 'Something went wrong!' });
-            });
-        } else {
-          return user;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({ message: 'Something went wrong!' });
-      });
-  })
-    .then((userObj) => {
-      if(userObj) {
-        console.log(userObj);
-        res.send(userObj);
+router.get('/', (req, res, next) => {
+  console.log('GET /users');
+  db.any('SELECT id, username FROM users;')
+    .then((userList) => {
+      if(userList) {
+        res.send(userList);
       }
     })
     .catch((error) => {
@@ -45,5 +16,37 @@ router.get('/', checkJwt, (req, res, next) => {
     });
 });
 
+router.get('/:userId', (req, res, next) => {
+  console.log('GET /users/'+req.params.userId);
+  db.task(t => {
+    return t.one('SELECT id, username FROM users WHERE id = $1;', [req.params.userId])
+      .then((userData) => {
+        return t.any('SELECT ambs.id AS id, name, users.username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE owner_id = $1;', [userData.id])
+          .then((ambData) => {
+            return {
+              name: userData.username,
+              ambs: ambData,
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            res.status(500).send({ message: 'Something went wrong!' });
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({ message: 'Something went wrong!' });
+      });
+  })
+    .then((dataObj) => {
+      if(dataObj) {
+        res.send(dataObj);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ message: 'Something went wrong!' });
+    });
+});
 
 module.exports = router;
