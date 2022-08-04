@@ -3,7 +3,6 @@ import ReactPlayer from "react-player/lazy";
 import SoundAudioNode from "./sound-audio-node";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 
 function SoundElement(props){
   const [playerVolume, setPlayerVolume] = useState(props.volume);
@@ -16,7 +15,7 @@ function SoundElement(props){
     if(props.isSelected) {
       setLoops(Math.floor(Math.random() * (props.chain.to - props.chain.from + 1)) + props.chain.from);
     }
-  }, [props.isSelected]);
+  }, [props.isSelected, props.chain.to, props.chain.from]);
 
   const progressLoops = () => {
     if(loopsRef.current > 0)

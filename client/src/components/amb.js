@@ -38,7 +38,7 @@ function Amb(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, [props.ambId, serverUrl]);
+  }, [props.ambId, serverUrl, props.audioContext.state]);
 
   const renderSoundGroups = () => {
     return (

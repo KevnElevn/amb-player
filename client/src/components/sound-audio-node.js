@@ -31,7 +31,7 @@ function SoundAudioNode(props){
       audioNode.disconnect();
       gainNode.disconnect();
     }
-  }, [props.isPlaying, props.volume, props.loops])
+  }, [props.isPlaying, props.volume, props.loops, audioNode, gainNode, props.audioContext.destination]);
 
   return (
     <>

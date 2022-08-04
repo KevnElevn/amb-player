@@ -11,12 +11,13 @@ function AmbPage(props){
   audioCtx.suspend();
   console.log(audioCtx.state);
   let params = useParams();
+
   useEffect(() => {
     return () => {
       console.log('cleanup');
       audioCtx.close();
     }
-  },[]);
+  },[audioCtx]);
 
   const renderAmb = () => {
     if(editing) {
