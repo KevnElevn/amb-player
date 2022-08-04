@@ -128,23 +128,6 @@ function SoundGroupModal(props) {
         })
   }
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
-        <Alert
-          className="my-2"
-          variant="danger"
-          onClose={() => setShowAlert(false)}
-          dismissible
-        >
-          {alertMessage}
-        </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
   const renderDeleteButton = () => {
     if(isDeleting) {
       return (
@@ -196,44 +179,54 @@ function SoundGroupModal(props) {
         <Modal.Title>{props.edit ? "Edit" : "Create new"} sound group</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      {renderAlert()}
-      <Row>
-        <Form>
-          <Form.Group controlId="formGroupName">
-            <Form.Label>Group Name</Form.Label>
-            <Form.Control
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+        <Row>
+          <Alert
+            className="my-2 text-center"
+            variant="danger"
+            show={showAlert}
+            onClose={() => setShowAlert(false)}
+            dismissible
+          >
+            {alertMessage}
+          </Alert>
+        </Row>
+        <Row>
+          <Form>
+            <Form.Group controlId="formGroupName">
+              <Form.Label>Group Name</Form.Label>
+              <Form.Control
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Row>
+        <Row className="mt-2 pb-2">
+          <Col sm={2}>
+            Interval
+            <HoverTip
+              id="intervalTip"
+              message="Seconds between selecting next sound"
             />
-          </Form.Group>
-        </Form>
-      </Row>
-      <Row className="mt-2 pb-2">
-        <Col sm={2}>
-          Interval
-          <HoverTip
-            id="intervalTip"
-            message="Seconds between selecting next sound"
-          />
-        </Col>
-        <Col>
-          <Form.Group controlId="formIntervalFrom">
-            <Form.Label>From</Form.Label>
-            <Form.Control
-              value={intervalFrom}
-              onChange={(e) => setIntervalFrom(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="formIntervalTo">
-            <Form.Label>To</Form.Label>
-            <Form.Control
-              value={intervalTo}
-              onChange={(e) => setIntervalTo(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
+          </Col>
+          <Col>
+            <Form.Group controlId="formIntervalFrom">
+              <Form.Label>From</Form.Label>
+              <Form.Control
+                value={intervalFrom}
+                onChange={(e) => setIntervalFrom(e.target.value)}
+              />
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group controlId="formIntervalTo">
+              <Form.Label>To</Form.Label>
+              <Form.Control
+                value={intervalTo}
+                onChange={(e) => setIntervalTo(e.target.value)}
+              />
+            </Form.Group>
+          </Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>

@@ -144,23 +144,6 @@ function SoundElementModal(props) {
         })
   }
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
-        <Alert
-          className="my-2"
-          variant="danger"
-          onClose={() => setShowAlert(false)}
-          dismissible
-        >
-          {alertMessage}
-        </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
   const renderDeleteButton = () => {
     if(isDeleting) {
       return (
@@ -213,79 +196,89 @@ function SoundElementModal(props) {
         <Modal.Title>{props.edit ? "Edit" : "Create new" } sound element</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      {renderAlert()}
-      <Row>
-        <Form>
-          <Form.Group controlId="formSoundName">
-            <Form.Label>Sound Name</Form.Label>
-            <Form.Control
-              value={soundName}
-              onChange={(e) => setSoundName(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
-      </Row>
-      <Row className="my-2">
-        <Form>
-          <Form.Group controlId="formUrl">
-            <Form.Label>
-              Url
-              <HoverTip
-                id="urlTip"
-                message="Supports YouTube links and direct audio file links"
+        <Row>
+          <Alert
+            className="my-2 text-center"
+            variant="danger"
+            show={showAlert}
+            onClose={() => setShowAlert(false)}
+            dismissible
+          >
+            {alertMessage}
+          </Alert>
+        </Row>
+        <Row>
+          <Form>
+            <Form.Group controlId="formSoundName">
+              <Form.Label>Sound Name</Form.Label>
+              <Form.Control
+                value={soundName}
+                onChange={(e) => setSoundName(e.target.value)}
               />
-            </Form.Label>
-            <Form.Control
-              value={soundUrl}
-              onChange={(e) => setSoundUrl(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
-      </Row>
-      <Row className="mt-2">
-        <p>Volume: {soundVolume}</p>
-        <input
-          id={"vol"+props.ambId+props.groupId}
-          type="range"
-          min="0"
-          max="100"
-          value={soundVolume}
-          onChange={(e) => setSoundVolume(e.target.value)}
-          step="1"
-        />
-      </Row>
-      <Row className="mt-2 pb-2">
-        <Col sm={3}>
-          Timestamp
-          <HoverTip
-            id="timestampTip"
-            message="in seconds"
+            </Form.Group>
+          </Form>
+        </Row>
+        <Row className="my-2">
+          <Form>
+            <Form.Group controlId="formUrl">
+              <Form.Label>
+                Url
+                <HoverTip
+                  id="urlTip"
+                  message="Supports YouTube links and direct audio file links"
+                />
+              </Form.Label>
+              <Form.Control
+                value={soundUrl}
+                onChange={(e) => setSoundUrl(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Row>
+        <Row className="mt-2">
+          <p>Volume: {soundVolume}</p>
+          <input
+            id={"vol"+props.ambId+props.groupId}
+            type="range"
+            min="0"
+            max="100"
+            value={soundVolume}
+            onChange={(e) => setSoundVolume(e.target.value)}
+            step="1"
           />
-        </Col>
-        <Col>
-          <Form.Group controlId="formStartTime">
-            <Form.Label>Start</Form.Label>
-            <Form.Control
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+        </Row>
+        <Row className="mt-2 pb-2">
+          <Col sm={3}>
+            Timestamp
+            <HoverTip
+              id="timestampTip"
+              message="in seconds"
             />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="formEndTime">
-            <Form.Label>
-              End
-              <HoverTip
-                id="endTimeTip"
-                message="-1 means play to end"
+          </Col>
+          <Col>
+            <Form.Group controlId="formStartTime">
+              <Form.Label>Start</Form.Label>
+              <Form.Control
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
               />
-            </Form.Label>
-            <Form.Control
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group controlId="formEndTime">
+              <Form.Label>
+                End
+                <HoverTip
+                  id="endTimeTip"
+                  message="-1 means play to end"
+                />
+              </Form.Label>
+              <Form.Control
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+            </Form.Group>
+          </Col>
         </Row>
         <Row>
           <Col sm={3}>

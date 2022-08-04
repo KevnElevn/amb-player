@@ -29,31 +29,20 @@ function BrowsePage(props) {
       })
   }, [props, serverUrl]);
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
-        <Alert
-          className="my-2"
-          variant="danger"
-        >
-          <Row>
-            <Col className="text-center">
-              {alertMessage}
-            </Col>
-          </Row>
-        </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
   return (
     <Container>
       <Row className="text-center mt-2">
         <h2>Browse</h2>
       </Row>
-      {renderAlert()}
+      <Row>
+        <Alert
+          className="my-2 text-center"
+          variant="danger"
+          show={showAlert}
+        >
+          {alertMessage}
+        </Alert>
+      </Row>
       <Row>
         <AmbTable ambList={ambList} />
       </Row>

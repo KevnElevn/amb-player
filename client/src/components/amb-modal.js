@@ -47,23 +47,6 @@ function AmbModal(props) {
         })
   }
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
-        <Alert
-          className="my-2"
-          variant="danger"
-          onClose={() => setShowAlert(false)}
-          dismissible
-        >
-          {alertMessage}
-        </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
   return (
     <Modal
       show={props.show}
@@ -73,7 +56,17 @@ function AmbModal(props) {
         <Modal.Title>Create new Amb</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {renderAlert()}
+        <Row>
+          <Alert
+            className="my-2 text-center"
+            variant="danger"
+            show={showAlert}
+            onClose={() => setShowAlert(false)}
+            dismissible
+          >
+            {alertMessage}
+          </Alert>
+        </Row>
         <Row>
           <Form>
             <Form.Group controlId="formAmbName">

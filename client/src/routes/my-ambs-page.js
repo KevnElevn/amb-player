@@ -50,31 +50,20 @@ function MyAmbsPage(props) {
       })
   }, [props.userId, serverUrl]);
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
-        <Alert
-          className="my-2"
-          variant="danger"
-        >
-          <Row>
-            <Col className="text-center">
-              {alertMessage}
-            </Col>
-          </Row>
-        </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
   return (
     <Container>
       <Row className="text-center mt-2">
         <h2>My Ambs</h2>
       </Row>
-      {renderAlert()}
+      <Row>
+        <Alert
+          className="my-2 text-center"
+          variant="danger"
+          show={showAlert}
+        >
+          {alertMessage}
+        </Alert>
+      </Row>
       <Row className="text-start">
         <Col>
           <Button

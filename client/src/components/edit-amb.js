@@ -180,26 +180,19 @@ function EditAmb(props) {
     }
   }
 
-  const renderAlert = () => {
-    if(showAlert) {
-      return (
+  return(
+    <Container>
+      <Row>
         <Alert
-          className="my-2"
+          className="my-2 text-center"
           variant="danger"
+          show={showAlert}
           onClose={() => setShowAlert(false)}
           dismissible
         >
           {alertMessage}
         </Alert>
-      );
-    } else {
-      return null;
-    }
-  }
-
-  return(
-    <Container>
-      {renderAlert()}
+      </Row>
       <Row className="mt-2">
         <Form>
           <Form.Group controlId="ambNameForm">
