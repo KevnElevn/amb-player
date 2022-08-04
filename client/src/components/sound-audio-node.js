@@ -16,14 +16,13 @@ function SoundAudioNode(props){
   audio.ontimeupdate = (event) => {
     if(audio.currentTime >= endTime) {
       audio.currentTime = props.start;
-      audio.play();
       props.onEnded();
     }
   }
 
   useEffect(() => {
     audioNode.connect(gainNode).connect(props.audioContext.destination);
-    if(props.isPlaying)
+    if(props.isPlaying && props.loops >= 0)
       audioNode.mediaElement.play();
     else
       audioNode.mediaElement.pause();
@@ -32,7 +31,7 @@ function SoundAudioNode(props){
       audioNode.disconnect();
       gainNode.disconnect();
     }
-  }, [props.isPlaying, props.volume])
+  }, [props.isPlaying, props.volume, props.loops])
 
   return (
     <>

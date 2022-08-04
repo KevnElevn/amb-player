@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactPlayer from "react-player/lazy";
 import SoundAudioNode from "./sound-audio-node";
 import Row from "react-bootstrap/Row";
@@ -7,17 +7,33 @@ import Button from "react-bootstrap/Button";
 
 function SoundElement(props){
   const [playerVolume, setPlayerVolume] = useState(props.volume);
-  const ref = React.createRef();
-  let loops = Math.floor(Math.random() * (props.chain.to - props.chain.from + 1)) + props.chain.from;
+  const [loops, setLoops] = useState(0);
+  const playerRef = useRef();
+  const loopsRef = useRef();
+  loopsRef.current = loops;
+
+  useEffect(() => {
+    if(props.isSelected) {
+      setLoops(Math.floor(Math.random() * (props.chain.to - props.chain.from + 1)) + props.chain.from);
+    }
+  }, [props.isSelected]);
+
+  const progressLoops = () => {
+    if(loopsRef.current > 0)
+      setLoops(loopsRef.current-1);
+    else
+      props.onFinish();
+  }
+
   const renderAudioSource = () => {
     if(props.url.includes('youtube.com') || props.url.includes('youtu.be')) {
       return (
         <ReactPlayer
-          ref={ref}
+          ref={playerRef}
           id={"player"+props.id}
           url={props.url}
           volume={playerVolume/100}
-          playing={props.isPlaying}
+          playing={props.isPlaying && props.isSelected}
           controls={false}
           config={{
             youtube: {
@@ -28,12 +44,12 @@ function SoundElement(props){
             }
           }}
           onEnded={() => {
-            if(loops > 0) {
-              loops--;
-              ref.current.seekTo(props.start);
+            if(loopsRef.current > 0) {
+              setLoops(loopsRef.current-1);
+              playerRef.current.seekTo(props.start);
             } else {
-              ref.current.getInternalPlayer().pauseVideo();
-              ref.current.seekTo(props.start);
+              playerRef.current.getInternalPlayer().pauseVideo();
+              playerRef.current.seekTo(props.start);
               props.onFinish();
             }
           }}
@@ -47,18 +63,13 @@ function SoundElement(props){
           id={"player"+props.id}
           url={props.url}
           volume={playerVolume/100}
-          isPlaying={props.isPlaying && loops >= 0}
+          isPlaying={props.isPlaying && props.isSelected}
           audioContext={props.audioContext}
           start={props.start}
           end={props.end}
           chain={props.chain}
-          onEnded={() => {
-            if(loops > 0)
-              loops--;
-            else {
-              props.onFinish();
-            }
-          }}
+          loops={loops}
+          onEnded={() => progressLoops()}
         />
       );
     }
@@ -68,14 +79,6 @@ function SoundElement(props){
     <Row className="mt-2 py-3 border-top">
       <Row>
         <Col><h5>{props.name}</h5></Col>
-        <Col xs={2} className="center-text">
-          {props.isPlaying ?
-            <Button variant="secondary" onClick={() => ref.current.seekTo(props.end > 0 ? props.end : ref.current.getDuration())}>
-              Skip to end
-            </Button>
-            : null
-          }
-        </Col>
       </Row>
       <Row className="mb-2">
         <p>Volume: {playerVolume}</p>

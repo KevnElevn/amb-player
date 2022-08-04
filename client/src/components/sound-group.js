@@ -20,7 +20,8 @@ function SoundGroup(props){
         start={element.start}
         end={element.end}
         chain={element.chain}
-        isPlaying={isGroupOn && props.isPlaying && index === playingId}
+        isPlaying={isGroupOn && props.isPlaying}
+        isSelected={index === playingId}
         onFinish={
           () => {
             setPlayingId(-1);
