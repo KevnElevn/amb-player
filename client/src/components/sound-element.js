@@ -3,6 +3,7 @@ import ReactPlayer from "react-player/lazy";
 import SoundAudioNode from "./sound-audio-node";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Badge from "react-bootstrap/Badge";
 
 function SoundElement(props){
   const [playerVolume, setPlayerVolume] = useState(props.volume);
@@ -76,8 +77,19 @@ function SoundElement(props){
 
   return (
     <Row className="mt-2 py-3 border-top">
-      <Row>
-        <Col><h5>{props.name}</h5></Col>
+      <Row className="mb-2">
+        <Col xs="auto">
+          <h5>
+            {props.name}
+          </h5>
+        </Col>
+        <Col>
+          {
+            props.isPlaying && props.isSelected ?
+              <Badge pill bg="info">Playing</Badge>
+            : null
+          }
+        </Col>
       </Row>
       <Row className="mb-2">
         <p>Volume: {playerVolume}</p>

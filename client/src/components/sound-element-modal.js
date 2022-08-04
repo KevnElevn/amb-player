@@ -6,6 +6,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
+import HoverTip from "./hover-tip";
 
 function SoundElementModal(props) {
   const [soundName, setSoundName] = useState("New Sound Element");
@@ -227,7 +228,13 @@ function SoundElementModal(props) {
       <Row className="my-2">
         <Form>
           <Form.Group controlId="formUrl">
-            <Form.Label>Url</Form.Label>
+            <Form.Label>
+              Url
+              <HoverTip
+                id="urlTip"
+                message="Supports YouTube links and direct audio file links"
+              />
+            </Form.Label>
             <Form.Control
               value={soundUrl}
               onChange={(e) => setSoundUrl(e.target.value)}
@@ -250,6 +257,10 @@ function SoundElementModal(props) {
       <Row className="mt-2 pb-2">
         <Col sm={3}>
           Timestamp
+          <HoverTip
+            id="timestampTip"
+            message="in seconds"
+          />
         </Col>
         <Col>
           <Form.Group controlId="formStartTime">
@@ -262,7 +273,13 @@ function SoundElementModal(props) {
         </Col>
         <Col>
           <Form.Group controlId="formEndTime">
-            <Form.Label>End</Form.Label>
+            <Form.Label>
+              End
+              <HoverTip
+                id="endTimeTip"
+                message="-1 means play to end"
+              />
+            </Form.Label>
             <Form.Control
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
@@ -273,6 +290,10 @@ function SoundElementModal(props) {
         <Row>
           <Col sm={3}>
             Chain
+            <HoverTip
+              id="chainTip"
+              message="Additional times to play"
+            />
           </Col>
           <Col>
             <Form.Group controlId="formChainFrom">

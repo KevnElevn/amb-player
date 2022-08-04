@@ -6,6 +6,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
+import HoverTip from "./hover-tip";
 
 function SoundGroupModal(props) {
   const [groupName, setGroupName] = useState("New Group");
@@ -210,6 +211,10 @@ function SoundGroupModal(props) {
       <Row className="mt-2 pb-2">
         <Col sm={2}>
           Interval
+          <HoverTip
+            id="intervalTip"
+            message="Seconds between selecting next sound"
+          />
         </Col>
         <Col>
           <Form.Group controlId="formIntervalFrom">

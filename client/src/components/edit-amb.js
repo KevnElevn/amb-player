@@ -227,7 +227,7 @@ function EditAmb(props) {
           <Button
             onClick={() => putEditAmb()}
           >
-            Save
+            Save Name
           </Button>
         </Col>
         <Col className="text-start">
