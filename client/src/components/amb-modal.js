@@ -30,19 +30,32 @@ function AmbModal(props) {
       };
       fetch(serverUrl+'/ambs/', requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log("POST created new amb " + res.ambId);
-          setAmbName('New Amb');
-          props.refresh();
-          props.handleClose();
+          if(res.ok) {
+            return res.json()
+              .then((res) => {
+                console.log("POST created new amb " + res.ambId);
+                setAmbName('New Amb');
+                props.refresh();
+                props.handleClose();
+              })
+              .catch(error => {
+                console.error(error);
+              })
+          } else {
+            return res.json()
+              .then(res => {
+                console.log(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
         })
   }

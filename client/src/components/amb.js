@@ -23,21 +23,34 @@ function Amb(props) {
     console.log('Getting Amb data...');
     fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then((result) => {
-        setAmbName(result.ambName);
-        setAmbOwner(result.ambOwner);
-        setAmbOwnerId(result.ambOwnerId);
-        setAmbData(result.ambData);
+        if(res.ok) {
+          return res.json()
+            .then((result) => {
+              setAmbName(result.ambName);
+              setAmbOwner(result.ambOwner);
+              setAmbOwnerId(result.ambOwnerId);
+              setAmbData(result.ambData);
+            })
+            .catch(error => {
+              console.error(error);
+            })
+        } else {
+          return res.json()
+            .then(res => {
+              console.log(res.message);
+              setAlertMessage(res.message);
+              setShowAlert(true);
+            })
+            .catch(error => {
+              console.error(error);
+            })
+        }
       })
       .catch(error => {
         console.error(error);
-        setAlertMessage(error.message);
+        setAlertMessage('Failed to fetch');
         setShowAlert(true);
-      })
+      });
   }, [props.ambId, serverUrl, props.audioContext.state]);
 
   const renderSoundGroups = () => {
