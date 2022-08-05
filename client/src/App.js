@@ -21,6 +21,7 @@ import ProfilePage from "./routes/profile-page";
 
 function App() {
   const [userId, setUserId] = useState(-1);
+  const [username, setUsername] = useState('');
 
   const serverUrl = process.env.REACT_APP_SERVER_URL;
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -41,8 +42,9 @@ function App() {
           throw new Error('Server error!');
         return res.json();
       })
-      .then((res) => { console.log(res.username, res.id);
+      .then((res) => {
         setUserId(res.id);
+        setUsername(res.username);
         console.log(`Logged in as user: ${res.username} with id: ${res.id}`);
       })
       .catch(error => {
@@ -76,7 +78,7 @@ function App() {
       </Navbar>
       <Outlet />
       <Routes>
-        <Route path="myambs" element={<MyAmbsPage userId={userId} />} />
+        <Route path="myambs" element={<MyAmbsPage userId={userId} username={username} updateUsername={(name) => setUsername(name)}/>} />
         <Route path="search" element={<SearchPage userId={userId} />} />
         <Route path="browse" element={<BrowsePage userId={userId} />} />
         <Route path="users" element={<UsersPage userId={userId} />} />

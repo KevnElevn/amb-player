@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
 import AmbTable from '../components/amb-table';
 
@@ -31,12 +30,12 @@ function ProfilePage(props) {
         setAlertMessage(error.message);
         setShowAlert(true);
       })
-  }, [props, serverUrl]);
+  }, [props, serverUrl, params]);
 
   return (
     <Container>
       <Row className="text-center mt-2">
-        <h2>{userName}'s Profile</h2>
+        <h2>{userName}'s Page</h2>
       </Row>
       <Row>
         <Alert
