@@ -41,7 +41,8 @@ router.get('/:userId', (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
-        res.status(500).send({ message: 'Something went wrong!' });
+        console.log('User not found');
+        res.status(500).send({ message: 'User not found' });
       });
   })
     .then((dataObj) => {

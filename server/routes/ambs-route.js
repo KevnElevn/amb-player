@@ -71,7 +71,7 @@ router.get('/:ambId', (req, res, next) => {
       });
     } else {
       console.log('Bad input');
-      res.status(500).send({ message: 'Something went wrong! '});
+      res.status(500).send({ message: 'Bad input' });
     }
 });
 //Create new Amb
@@ -87,7 +87,7 @@ router.post('/', checkJwt, (req, res, next) => {
         .catch((error) => {
           console.log(error);
           console.log("Invalid user");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Invalid user' });
         });
     })
       .then((newAmb) => {
@@ -99,11 +99,11 @@ router.post('/', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not create new Amb');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to create new Amb' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Create new group in Amb
@@ -125,7 +125,7 @@ router.post('/:ambId', checkJwt, (req, res, next) => {
         .catch((error) => {
           console.log(error);
           console.log("User not owner or Amb not found");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then((newGroup) => {
@@ -137,11 +137,11 @@ router.post('/:ambId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not create new group');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to create new group' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Create new sound in group
@@ -173,14 +173,14 @@ router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
             })
             .catch((error) => {
               console.log(error);
-              console.log("User not owner or Amb/group not found");
-              res.status(500).send({ message: 'Something went wrong!' });
+              console.log("Group not found");
+              res.status(500).send({ message: 'Group not found' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log("User not owner or Amb not found");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then((newSound) => {
@@ -191,12 +191,12 @@ router.post('/:ambId/:groupId', checkJwt, (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
-        console.log('Could not create new sonud');
-        res.status(500).send({ message: 'Something went wrong!' });
+        console.log('Could not create new sound');
+        res.status(500).send({ message: 'Unable to create new sound' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Delete Amb
@@ -214,13 +214,13 @@ router.delete('/:ambId', checkJwt, (req, res, next) => {
             .catch((error) => {
               console.log(error);
               console.log('Amb not empty');
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Amb not empty' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log('Amb not found or user not owner');
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then((result) => {
@@ -232,11 +232,11 @@ router.delete('/:ambId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not delete Amb');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to delete Amb' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Delete sound group in Amb
@@ -257,19 +257,19 @@ router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
                 .catch((error) => {
                   console.log(error);
                   console.log('Sound group not empty');
-                  res.status(500).send({ message: 'Something went wrong!' });
+                  res.status(500).send({ message: 'Sound group not emtpy' });
                 });
             })
             .catch((error) => {
               console.log(error);
               console.log("Group not found");
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Group not found' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log('Amb not found or user not owner');
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then(result => {
@@ -281,11 +281,11 @@ router.delete('/:ambId/:groupId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not delete group');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to delete group' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Delete sound from group
@@ -305,13 +305,13 @@ router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
             .catch((error) => {
               console.log(error);
               console.log('Sound not found');
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Sound not found' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log('Amb not found or user not owner');
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then((result) => {
@@ -323,11 +323,11 @@ router.delete('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not delete sound');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to delete sound' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Edit Amb
@@ -344,7 +344,7 @@ router.put('/:ambId', checkJwt, (req, res, next) => {
         .catch((error) => {
           console.log(error);
           console.log("User not owner or Amb not found");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then(result => {
@@ -356,11 +356,11 @@ router.put('/:ambId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not update Amb');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to update Amb' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Edit group
@@ -385,13 +385,13 @@ router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
             .catch((error) => {
               console.log(error);
               console.log('Group not found');
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Group not found' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log("User not owner or Amb not found");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then(result => {
@@ -403,11 +403,11 @@ router.put('/:ambId/:groupId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not update group');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'unable to update group' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 //Edit sound
@@ -441,13 +441,13 @@ router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
             .catch((error) => {
               console.log(error);
               console.log('Sound not found');
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Sound not found' });
             });
         })
         .catch((error) => {
           console.log(error);
           console.log("User not owner or Amb not found");
-          res.status(500).send({ message: 'Something went wrong!' });
+          res.status(500).send({ message: 'Unable to interact with Amb' });
         });
     })
       .then(result => {
@@ -459,11 +459,11 @@ router.put('/:ambId/:groupId/:soundId', checkJwt, (req, res, next) => {
       .catch((error) => {
         console.log(error);
         console.log('Could not update sound');
-        res.status(500).send({ message: 'Something went wrong!' });
+        res.status(500).send({ message: 'Unable to update sound' });
       });
   } else {
     console.log("Bad input");
-    res.status(500).send({ message: 'Something went wrong!' });
+    res.status(500).send({ message: 'Bad input' });
   }
 });
 

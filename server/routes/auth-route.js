@@ -22,7 +22,7 @@ router.get('/', checkJwt, (req, res, next) => {
             .catch((error) => {
               console.log('Failed to create new user');
               console.log(error);
-              res.status(500).send({ message: 'Something went wrong!' });
+              res.status(500).send({ message: 'Failed to create new user' });
             });
         } else {
           return user;
