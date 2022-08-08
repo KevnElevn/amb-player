@@ -24,7 +24,7 @@ function Amb(props) {
     fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.ok) {
-          return res.json()
+          res.json()
             .then((result) => {
               setAmbName(result.ambName);
               setAmbOwner(result.ambOwner);
@@ -35,7 +35,7 @@ function Amb(props) {
               console.error(error);
             })
         } else {
-          return res.json()
+          res.json()
             .then(res => {
               console.log(res.message);
               setAlertMessage(res.message);

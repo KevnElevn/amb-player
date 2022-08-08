@@ -31,7 +31,7 @@ function AmbModal(props) {
       fetch(serverUrl+'/ambs/', requestOptions)
         .then(res => {
           if(res.ok) {
-            return res.json()
+            res.json()
               .then((res) => {
                 console.log("POST created new amb " + res.ambId);
                 setAmbName('New Amb');
@@ -42,7 +42,7 @@ function AmbModal(props) {
                 console.error(error);
               })
           } else {
-            return res.json()
+            res.json()
               .then(res => {
                 console.log(res.message);
                 setAlertMessage(res.message);

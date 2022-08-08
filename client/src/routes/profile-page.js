@@ -17,19 +17,32 @@ function ProfilePage(props) {
     console.log("Getting user data...");
     fetch(serverUrl+"/users/"+params.userId)
       .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then(result => {
-        setUserName(result.name);
-        setUserAmbs(result.ambs);
+        if(res.ok) {
+          res.json()
+            .then(res => {
+              setUserName(res.name);
+              setUserAmbs(res.ambs);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          res.json()
+            .then(res => {
+              console.error(res.message);
+              setAlertMessage(res.message);
+              setShowAlert(true);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
       })
       .catch(error => {
         console.error(error);
-        setAlertMessage(error.message);
+        setAlertMessage('Failed to fetch');
         setShowAlert(true);
-      })
+      });
   }, [props, serverUrl, params]);
 
   return (

@@ -43,23 +43,36 @@ function SoundGroupModal(props) {
       };
       fetch(serverUrl+'/ambs/'+props.ambId, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log("Created new group " + res.group_id + "in Amb " + props.amb_id);
-          setGroupName('New Group');
-          setIntervalFrom(0);
-          setIntervalTo(0);
-          props.refresh();
-          props.handleClose();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log("Created new group " + res.group_id + "in Amb " + props.amb_id);
+                setGroupName('New Group');
+                setIntervalFrom(0);
+                setIntervalTo(0);
+                props.refresh();
+                props.handleClose();
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const putEditGroup = async () => {
@@ -78,20 +91,33 @@ function SoundGroupModal(props) {
       };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log(`Updated group ${res.group_id} from Amb ${res.amb_id}`);
-          props.refresh();
-          props.handleClose();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log(`Updated group ${res.group_id} from Amb ${res.amb_id}`);
+                props.refresh();
+                props.handleClose();
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const deleteSoundGroup = async () => {
@@ -113,19 +139,32 @@ function SoundGroupModal(props) {
       };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log(`Deleted group ${res.group_id} from Amb ${res.amb_id}`);
-          props.refresh();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log(`Deleted group ${res.group_id} from Amb ${res.amb_id}`);
+                props.refresh();
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const renderDeleteButton = () => {

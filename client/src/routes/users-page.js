@@ -15,18 +15,31 @@ function UsersPage(props) {
     console.log("Getting Ambs list...");
     fetch(serverUrl+"/users")
       .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then(result => {
-        setUserList(result);
+        if(res.ok) {
+          res.json()
+            .then(res => {
+              setUserList(res);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          res.json()
+            .then(res => {
+              console.error(res.message);
+              setAlertMessage(res.message);
+              setShowAlert(true);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
       })
       .catch(error => {
         console.error(error);
-        setAlertMessage(error.message);
+        setAlertMessage('Failed to fetch');
         setShowAlert(true);
-      })
+      });
   }, [props, serverUrl]);
 
   return (

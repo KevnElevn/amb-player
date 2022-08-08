@@ -20,36 +20,62 @@ function MyAmbsPage(props) {
     console.log("Getting Ambs list...");
     fetch(serverUrl+"/directory/?user="+props.userId)
       .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then(result => {
-        setMyAmbsList(result);
+        if(res.ok) {
+          res.json()
+            .then(res => {
+              setMyAmbsList(res);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          res.json()
+            .then(res => {
+              console.error(res.message);
+              setAlertMessage(res.message);
+              setShowAlert(true);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
       })
       .catch(error => {
         console.error(error);
-        setAlertMessage(error.message);
+        setAlertMessage('Failed to fetch');
         setShowAlert(true);
-      })
+      });
   };
 
   useEffect(() => {
     console.log("Getting Ambs list...");
     fetch(serverUrl+"/directory/?user="+props.userId)
       .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then(result => {
-        setMyAmbsList(result);
+        if(res.ok) {
+          res.json()
+            .then(res => {
+              setMyAmbsList(res);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          res.json()
+            .then(res => {
+              console.error(res.message);
+              setAlertMessage(res.message);
+              setShowAlert(true);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        }
       })
       .catch(error => {
         console.error(error);
-        setAlertMessage(error.message);
+        setAlertMessage('Failed to fetch');
         setShowAlert(true);
-      })
+      });
   }, [props.userId, serverUrl]);
 
   return (

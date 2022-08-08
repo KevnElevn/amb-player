@@ -34,7 +34,7 @@ function UserModal(props) {
       fetch(serverUrl+'/users/'+props.userId, requestOptions)
         .then(res => {
           if(res.ok) {
-            return res.json()
+            res.json()
               .then((res) => {
                 console.log("PUT updated username to " + res.username);
                 props.refresh(res.username);
@@ -44,7 +44,7 @@ function UserModal(props) {
                 console.error(error);
               })
           } else {
-            return res.json()
+            res.json()
               .then((res) => {
                 console.log(res.message);
                 setAlertMessage(res.message);
@@ -57,6 +57,8 @@ function UserModal(props) {
         })
         .catch(error => {
           console.error(error);
+          setAlertMessage('Failed to fetch');
+          setShowAlert(true);
         });
   }
 

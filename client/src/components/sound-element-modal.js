@@ -56,27 +56,40 @@ function SoundElementModal(props) {
       };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}`, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log(`Created sound ${res.sound_id} for group ${res.group_id} in Amb #${res.amb_id}`);
-          setSoundName('New Sound Element');
-          setSoundUrl('');
-          setSoundVolume(100);
-          setStartTime(0);
-          setEndTime(-1);
-          setChainFrom(0);
-          setChainTo(0);
-          props.refresh();
-          props.handleClose();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log(`Created sound ${res.sound_id} for group ${res.group_id} in Amb #${res.amb_id}`);
+                setSoundName('New Sound Element');
+                setSoundUrl('');
+                setSoundVolume(100);
+                setStartTime(0);
+                setEndTime(-1);
+                setChainFrom(0);
+                setChainTo(0);
+                props.refresh();
+                props.handleClose();
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const putEditSound = async () => {
@@ -99,20 +112,33 @@ function SoundElementModal(props) {
       };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log(`Updated Sound ${res.sound_id} of group ${res.group_id} in Amb ${res.amb_id}`);
-          props.refresh();
-          props.handleClose();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log(`Updated Sound ${res.sound_id} of group ${res.group_id} in Amb ${res.amb_id}`);
+                props.refresh();
+                props.handleClose();
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const deleteSoundElement = async () => {
@@ -129,19 +155,32 @@ function SoundElementModal(props) {
       };
       fetch(`${serverUrl}/ambs/${props.ambId}/${props.groupId}/${props.soundId}`, requestOptions)
         .then(res => {
-          if(res.status >= 400)
-            throw new Error('Server error!');
-          return res.json();
-        })
-        .then((res) => {
-          console.log(`Deleted sound ${res.sound_id} from group ${res.group_id} in Amb ${res.amb_id}`);
-          props.refresh();
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                console.log(`Deleted sound ${res.sound_id} from group ${res.group_id} in Amb ${res.amb_id}`);
+                props.refresh();
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }
         })
         .catch(error => {
           console.error(error);
-          setAlertMessage(error.message);
+          setAlertMessage('Failed to fetch');
           setShowAlert(true);
-        })
+        });
   }
 
   const renderDeleteButton = () => {

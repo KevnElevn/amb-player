@@ -29,7 +29,7 @@ function EditAmb(props) {
     fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.ok) {
-          return res.json()
+          res.json()
             .then((result) => {
               setAmbName(result.ambName);
               setAmbOwner(result.ambOwner);
@@ -39,7 +39,7 @@ function EditAmb(props) {
               console.error(error);
             })
         } else {
-          return res.json()
+          res.json()
             .then(res => {
               console.log(res.message);
               setAlertMessage(res.message);
@@ -62,7 +62,7 @@ function EditAmb(props) {
     fetch(serverUrl+'/ambs/'+props.ambId)
       .then(res => {
         if(res.ok) {
-          return res.json()
+          res.json()
             .then((result) => {
               setAmbName(result.ambName);
               setAmbOwner(result.ambOwner);
@@ -72,7 +72,7 @@ function EditAmb(props) {
               console.error(error);
             })
         } else {
-          return res.json()
+          res.json()
             .then(res => {
               console.log(res.message);
               setAlertMessage(res.message);
@@ -106,7 +106,7 @@ function EditAmb(props) {
       fetch(`${serverUrl}/ambs/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.ok) {
-            return res.json()
+            res.json()
               .then((res) => {
                 console.log(`Updated Amb ${res.id}`);
                 getData();
@@ -115,7 +115,7 @@ function EditAmb(props) {
                 console.error(error);
               })
           } else {
-            return res.json()
+            res.json()
               .then(res => {
                 console.log(res.message);
                 setAlertMessage(res.message);
@@ -153,7 +153,7 @@ function EditAmb(props) {
       fetch(`${serverUrl}/ambs/${props.ambId}`, requestOptions)
         .then(res => {
           if(res.ok) {
-            return res.json()
+            res.json()
               .then((res) => {
                 console.log('Deleted Amb ' + res.id );
                 setExitPage(true);
@@ -162,7 +162,7 @@ function EditAmb(props) {
                 console.error(error);
               })
           } else {
-            return res.json()
+            res.json()
               .then(res => {
                 console.log(res.message);
                 setAlertMessage(res.message);

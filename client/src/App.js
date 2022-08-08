@@ -28,33 +28,47 @@ function App() {
 
   useEffect(() => {
     const getUserId = async () => {
-    const token = await getAccessTokenSilently();
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    fetch(`${serverUrl}/auth`, requestOptions)
-      .then(res => {
-        if(res.status >= 400)
-          throw new Error('Server error!');
-        return res.json();
-      })
-      .then((res) => {
-        setUserId(res.id);
-        setUsername(res.username);
-        console.log(`Logged in as user: ${res.username} with id: ${res.id}`);
-      })
-      .catch(error => {
-        console.error(error);
-      })
+      const token = await getAccessTokenSilently();
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      fetch(`${serverUrl}/auth`, requestOptions)
+        .then(res => {
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                setUserId(res.id);
+                setUsername(res.username);
+                console.log(`Logged in as user: ${res.username} with id: ${res.id}`);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                setUserId(-1);
+                setUsername('');
+                console.error(res.message);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
     if(isAuthenticated) {
       getUserId();
     } else {
       setUserId(-1);
+      setUsername('');
       console.log('Not logged in');
     }
   }, [isAuthenticated, getAccessTokenSilently, serverUrl]);
