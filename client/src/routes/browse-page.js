@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import AmbTable from '../components/amb-table';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
 
 function BrowsePage(props) {

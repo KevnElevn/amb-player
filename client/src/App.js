@@ -15,7 +15,7 @@ import FrontPage from "./routes/front-page";
 import SearchPage from "./routes/search-page";
 import BrowsePage from "./routes/browse-page";
 import UsersPage from "./routes/users-page";
-import MyAmbsPage from "./routes/my-ambs-page";
+import MyPage from "./routes/my-page";
 import AmbPage from "./routes/amb-page";
 import ProfilePage from "./routes/profile-page";
 
@@ -79,7 +79,7 @@ function App() {
         <Navbar.Brand className="ms-3" as={Link} to="/">AmbPlayer</Navbar.Brand>
         <Nav>
           <Nav.Item>
-            <Nav.Link disabled={!isAuthenticated} as={NavLink} to="/myambs">My Ambs</Nav.Link>
+            <Nav.Link disabled={!isAuthenticated} as={NavLink} to="/mypage">My Page</Nav.Link>
           </Nav.Item>
           <Nav.Item>
               <Nav.Link as={NavLink} to="/browse">Browse</Nav.Link>
@@ -92,7 +92,7 @@ function App() {
       </Navbar>
       <Outlet />
       <Routes>
-        <Route path="myambs" element={<MyAmbsPage userId={userId} username={username} updateUsername={(name) => setUsername(name)}/>} />
+        <Route path="mypage" element={<MyPage userId={userId} username={username} updateUsername={(name) => setUsername(name)}/>} />
         <Route path="search" element={<SearchPage userId={userId} />} />
         <Route path="browse" element={<BrowsePage userId={userId} />} />
         <Route path="users" element={<UsersPage userId={userId} />} />

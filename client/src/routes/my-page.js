@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 import AmbTable from '../components/amb-table';
 import AmbModal from '../components/amb-modal';
 import UserModal from '../components/user-modal';
+import HoverTip from '../components/hover-tip';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 import Alert from 'react-bootstrap/Alert';
 
-function MyAmbsPage(props) {
+function MyPage(props) {
   const [myAmbsList, setMyAmbsList] = useState([]);
   const [showAmbModal, setShowAmbModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -81,10 +83,30 @@ function MyAmbsPage(props) {
   return (
     <Container>
       <Row className="text-center mt-2">
-        <h2>My Ambs</h2>
+        <h2>My Page</h2>
       </Row>
       <Row className="text-center">
         <h6>{props.username}</h6>
+      </Row>
+      <Row className="text-center">
+      {props.userId > -1 ?
+        <Col>
+          <Badge
+            as="button"
+            pill
+            variant="primary"
+            onClick={() => setShowUserModal(true)}
+          >
+            Change name
+          </Badge>
+          <HoverTip
+            id="passwordTip"
+            message="To change password: Log out, then select 'Forgot Password?' on the login page"
+          />
+        </Col>
+        : null
+      }
+
       </Row>
       <Row>
         <Alert
@@ -95,6 +117,9 @@ function MyAmbsPage(props) {
           {alertMessage}
         </Alert>
       </Row>
+      <Row>
+        <h3>My Ambs</h3>
+      </Row>
       <Row className="text-start">
         <Col>
           <Button
@@ -104,17 +129,11 @@ function MyAmbsPage(props) {
             Create
           </Button>
         </Col>
-        <Col className="text-end">
-          <Button
-            variant="primary"
-            onClick={() => setShowUserModal(true)}
-          >
-            Change name
-          </Button>
-        </Col>
       </Row>
       <Row>
+        <Col>
         <AmbTable ambList={myAmbsList} />
+        </Col>
       </Row>
       <AmbModal
         userId={props.userId}
@@ -133,4 +152,4 @@ function MyAmbsPage(props) {
   );
 }
 
-export default MyAmbsPage;
+export default MyPage;
