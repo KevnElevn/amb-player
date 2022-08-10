@@ -83,7 +83,12 @@ function UserModal(props) {
           </Alert>
         </Row>
         <Row>
-          <Form>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              putUpdateUsername();
+            }}
+          >
             <Form.Group controlId="formUsername">
               <Form.Label>Username</Form.Label>
               <Form.Control

@@ -247,32 +247,28 @@ function SoundElementModal(props) {
           </Alert>
         </Row>
         <Row>
-          <Form>
-            <Form.Group controlId="formSoundName">
-              <Form.Label>Sound Name</Form.Label>
-              <Form.Control
-                value={soundName}
-                onChange={(e) => setSoundName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
+          <Form.Group controlId="formSoundName">
+            <Form.Label>Sound Name</Form.Label>
+            <Form.Control
+              value={soundName}
+              onChange={(e) => setSoundName(e.target.value)}
+            />
+          </Form.Group>
         </Row>
         <Row className="my-2">
-          <Form>
-            <Form.Group controlId="formUrl">
-              <Form.Label>
-                Url
-                <HoverTip
-                  id="urlTip"
-                  message="Supports YouTube links and direct audio file links"
-                />
-              </Form.Label>
-              <Form.Control
-                value={soundUrl}
-                onChange={(e) => setSoundUrl(e.target.value)}
+          <Form.Group controlId="formUrl">
+            <Form.Label>
+              Url
+              <HoverTip
+                id="urlTip"
+                message="Supports YouTube links and direct audio file links"
               />
-            </Form.Group>
-          </Form>
+            </Form.Label>
+            <Form.Control
+              value={soundUrl}
+              onChange={(e) => setSoundUrl(e.target.value)}
+            />
+          </Form.Group>
         </Row>
         <Row className="mt-2">
           <p>Volume: {soundVolume}</p>

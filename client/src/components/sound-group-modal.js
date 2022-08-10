@@ -230,15 +230,13 @@ function SoundGroupModal(props) {
           </Alert>
         </Row>
         <Row>
-          <Form>
-            <Form.Group controlId="formGroupName">
-              <Form.Label>Group Name</Form.Label>
-              <Form.Control
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
+          <Form.Group controlId="formGroupName">
+            <Form.Label>Group Name</Form.Label>
+            <Form.Control
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+            />
+          </Form.Group>
         </Row>
         <Row className="mt-2 pb-2">
           <Col sm={2}>

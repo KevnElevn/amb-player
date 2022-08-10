@@ -19,6 +19,7 @@ function EditAmb(props) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [goodAlert, setGoodAlert] = useState(false);
   const [exitPage, setExitPage] = useState(false);
 
   const serverUrl = process.env.REACT_APP_SERVER_URL;
@@ -44,6 +45,7 @@ function EditAmb(props) {
               console.log(res.message);
               setAlertMessage(res.message);
               setShowAlert(true);
+              setGoodAlert(false);
             })
             .catch(error => {
               console.error(error);
@@ -54,6 +56,7 @@ function EditAmb(props) {
         console.error(error);
         setAlertMessage('Failed to fetch');
         setShowAlert(true);
+        setGoodAlert(false);
       });
     }, [props.ambId, serverUrl]);
 
@@ -77,6 +80,7 @@ function EditAmb(props) {
               console.log(res.message);
               setAlertMessage(res.message);
               setShowAlert(true);
+              setGoodAlert(false);
             })
             .catch(error => {
               console.error(error);
@@ -87,6 +91,7 @@ function EditAmb(props) {
         console.error(error);
         setAlertMessage('Failed to fetch');
         setShowAlert(true);
+        setGoodAlert(false);
       });
   }
 
@@ -109,6 +114,9 @@ function EditAmb(props) {
             res.json()
               .then((res) => {
                 console.log(`Updated Amb ${res.id}`);
+                setAlertMessage('Updated Amb name');
+                setGoodAlert(true);
+                setShowAlert(true);
                 getData();
               })
               .catch(error => {
@@ -120,6 +128,7 @@ function EditAmb(props) {
                 console.log(res.message);
                 setAlertMessage(res.message);
                 setShowAlert(true);
+                setGoodAlert(false);
               })
               .catch(error => {
                 console.error(error);
@@ -130,6 +139,7 @@ function EditAmb(props) {
           console.error(error);
           setAlertMessage('Failed to fetch');
           setShowAlert(true);
+          setGoodAlert(false);
         });
   }
 
@@ -137,6 +147,7 @@ function EditAmb(props) {
     if(ambData.length > 0) {
       setAlertMessage('Amb must be empty to delete!');
       setShowAlert(true);
+      setGoodAlert(false);
       return;
     }
     const token = await getAccessTokenSilently();
@@ -167,6 +178,7 @@ function EditAmb(props) {
                 console.log(res.message);
                 setAlertMessage(res.message);
                 setShowAlert(true);
+                setGoodAlert(false);
               })
               .catch(error => {
                 console.error(error);
@@ -177,6 +189,7 @@ function EditAmb(props) {
           console.error(error);
           setAlertMessage('Failed to fetch');
           setShowAlert(true);
+          setGoodAlert(false);
         });
   }
 
@@ -237,7 +250,7 @@ function EditAmb(props) {
       <Row>
         <Alert
           className="my-2 text-center"
-          variant="danger"
+          variant={goodAlert ? "success" : "danger"}
           show={showAlert}
           onClose={() => setShowAlert(false)}
           dismissible
@@ -246,7 +259,12 @@ function EditAmb(props) {
         </Alert>
       </Row>
       <Row className="mt-2">
-        <Form>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            putEditAmb();
+          }}
+        >
           <Form.Group controlId="ambNameForm">
             <Form.Label>Amb Name</Form.Label>
             <Form.Control

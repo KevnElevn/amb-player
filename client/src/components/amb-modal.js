@@ -81,7 +81,12 @@ function AmbModal(props) {
           </Alert>
         </Row>
         <Row>
-          <Form>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              postNewAmb();
+            }}
+          >
             <Form.Group controlId="formAmbName">
               <Form.Label>Amb Name </Form.Label>
               <Form.Control
