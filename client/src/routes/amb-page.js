@@ -14,7 +14,6 @@ function AmbPage(props){
 
   useEffect(() => {
     return () => {
-      console.log('cleanup');
       audioCtx.close();
     }
   },[audioCtx]);

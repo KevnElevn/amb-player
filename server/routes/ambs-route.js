@@ -8,11 +8,11 @@ const checkJwt = auth({
   issuerBaseURL: 'https://'+process.env.AUTH0_DOMAIN,
 });
 //Get Amb by ID
-router.get('/:ambId', (req, res, next) => {
+router.get('/:ambId/:userId', (req, res, next) => {
   if(Number(req.params.ambId) > 0) {
-    console.log("GET /ambs/"+req.params.ambId);
+    console.log("GET /ambs/"+req.params.ambId+"/"+req.params.userId);
     db.task (async t => {
-      let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr;
+      let ambInfo, groupInfo, soundsQueries, soundsArr, groupsArr, isFavorite;
       try {
         ambInfo = await t.one('SELECT name, owner_id, username AS owner_name FROM ambs JOIN users ON users.id = ambs.owner_id WHERE ambs.id = $1;', [req.params.ambId]);
       } catch(error) {
@@ -33,6 +33,15 @@ router.get('/:ambId', (req, res, next) => {
       } catch(error) {
         throw error;
       }
+      if(parseInt(req.params.userId) > 0) {
+        try {
+          isFavorite = await t.any('SELECT user_id, amb_id FROM favorites WHERE user_id = $1 AND amb_id = $2;', [req.params.userId, req.params.ambId]);
+          isFavorite = isFavorite.length >= 1;
+        } catch(error) {
+          throw error;
+        }
+      }
+
       groupsArr = groupInfo.map((group, index) => {
         return {
           groupName: group.name,
@@ -57,11 +66,11 @@ router.get('/:ambId', (req, res, next) => {
         ambOwner: ambInfo.owner_name,
         ambOwnerId: ambInfo.owner_id,
         ambData: groupsArr,
+        favorite: isFavorite,
       };
     })
       .then((ambObj) => {
         if(ambObj) {
-          console.log("Success");
           res.send(ambObj);
         }
       })

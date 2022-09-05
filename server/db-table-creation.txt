@@ -36,3 +36,11 @@ CREATE TABLE sounds (
   chain_from INT CHECK (chain_from >= 0 AND chain_from < 2000000000),
   chain_to INT CHECK (chain_to >= 0 AND chain_to < 2000000000)
 );
+
+CREATE TABLE favorites (
+  user_id INT NOT NULL,
+  amb_id INT NOT NULL,
+  PRIMARY KEY (user_id, amb_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (amb_id) REFERENCES ambs(id) ON DELETE CASCADE
+);

@@ -12,6 +12,7 @@ import Alert from 'react-bootstrap/Alert';
 
 function MyPage(props) {
   const [myAmbsList, setMyAmbsList] = useState([]);
+  const [myFavsList, setMyFavsList] = useState([]);
   const [showAmbModal, setShowAmbModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -50,6 +51,8 @@ function MyPage(props) {
   };
 
   useEffect(() => {
+    if(props.userId < 0)
+      return;
     console.log("Getting Ambs list...");
     fetch(serverUrl+"/directory/?user="+props.userId)
       .then(res => {
@@ -78,6 +81,35 @@ function MyPage(props) {
         setAlertMessage('Failed to fetch');
         setShowAlert(true);
       });
+
+      console.log("Getting Favorites list...");
+      fetch(serverUrl+"/favorites/"+props.userId)
+        .then(res => {
+          if(res.ok) {
+            res.json()
+              .then(res => {
+                setMyFavsList(res);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          } else {
+            res.json()
+              .then(res => {
+                console.error(res.message);
+                setAlertMessage(res.message);
+                setShowAlert(true);
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          setAlertMessage('Failed to fetch');
+          setShowAlert(true);
+        });
   }, [props.userId, serverUrl]);
 
   return (
@@ -132,7 +164,15 @@ function MyPage(props) {
       </Row>
       <Row>
         <Col>
-        <AmbTable ambList={myAmbsList} />
+          <AmbTable ambList={myAmbsList} />
+        </Col>
+      </Row>
+      <Row>
+        <h3>My Favorites</h3>
+      </Row>
+      <Row>
+        <Col>
+          <AmbTable ambList={myFavsList} />
         </Col>
       </Row>
       <AmbModal
