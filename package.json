@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha server/tests/api-tests.js",
-    "start": "node server/index.js",
+    "start": "npm run build && node server/index.js",
     "build": "cd client && npm install --production && npm run build"
   },
   "engines": {
