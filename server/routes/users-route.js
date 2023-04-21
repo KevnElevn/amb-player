@@ -9,7 +9,7 @@ const checkJwt = auth({
 });
 
 router.get('/', (req, res, next) => {
-  console.log('GET /users');
+  console.log('GET /userlist');
   db.any('SELECT id, username FROM users;')
     .then((userList) => {
       if(userList) {
@@ -23,7 +23,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:userId', (req, res, next) => {
-  console.log('GET /users/'+req.params.userId);
+  console.log('GET /userlist/'+req.params.userId);
   db.task(t => {
     return t.one('SELECT id, username FROM users WHERE id = $1;', [req.params.userId])
       .then((userData) => {
@@ -57,7 +57,7 @@ router.get('/:userId', (req, res, next) => {
 });
 
 router.put('/:userId', checkJwt, (req, res, next) => {
-  console.log(`PUT /users/`+req.params.userId);
+  console.log(`PUT /userlist/`+req.params.userId);
   db.task(t => {
     return t.one('SELECT username FROM users WHERE id = $1 AND sub = $2;', [req.params.userId, req.auth.payload.sub])
       .then((user) => {

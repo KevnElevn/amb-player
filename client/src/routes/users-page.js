@@ -12,7 +12,7 @@ function UsersPage(props) {
 
   useEffect(() => {
     console.log("Getting Ambs list...");
-    fetch(serverUrl+"/users")
+    fetch(serverUrl+"/userlist")
       .then(res => {
         if(res.ok) {
           res.json()

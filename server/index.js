@@ -19,7 +19,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/ambs', ambsRoute);
-app.use('/users', usersRoute);
+app.use('/userlist', usersRoute);
 app.use('/directory', directoryRoute);
 app.use('/favorites', favoritesRoute);
 app.use('/auth', authRoute);
