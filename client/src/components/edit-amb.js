@@ -22,7 +22,7 @@ function EditAmb(props) {
   const [goodAlert, setGoodAlert] = useState(false);
   const [exitPage, setExitPage] = useState(false);
 
-  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const serverUrl = process.env.SERVER_URL;
   const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {

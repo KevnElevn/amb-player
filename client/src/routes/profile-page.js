@@ -10,7 +10,7 @@ function ProfilePage(props) {
   const [userAmbs, setUserAmbs] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const serverUrl = process.env.REACT_APP_SERVER_URL;
+  const serverUrl = process.env.SERVER_URL;
   let params = useParams();
 
   useEffect(() => {
