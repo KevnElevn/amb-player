@@ -23,7 +23,7 @@ function App() {
   const [userId, setUserId] = useState(-1);
   const [username, setUsername] = useState('');
 
-  const serverUrl = process.env.SERVER_URL;
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
   const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {

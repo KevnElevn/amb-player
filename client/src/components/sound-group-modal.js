@@ -16,7 +16,7 @@ function SoundGroupModal(props) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  const serverUrl = process.env.SERVER_URL;
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
   const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
