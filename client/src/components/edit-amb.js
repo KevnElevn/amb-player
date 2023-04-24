@@ -27,7 +27,7 @@ function EditAmb(props) {
 
   useEffect(() => {
     console.log("Getting Amb data...");
-    fetch(serverUrl+'/ambs/'+props.ambId)
+    fetch(serverUrl+'/ambs/'+props.ambId+'/'+props.userId)
       .then(res => {
         if(res.ok) {
           res.json()
@@ -62,7 +62,7 @@ function EditAmb(props) {
 
   const getData = () => {
     console.log("Getting Amb data...");
-    fetch(serverUrl+'/ambs/'+props.ambId)
+    fetch(serverUrl+'/ambs/'+props.ambId+'/'+props.userId)
       .then(res => {
         if(res.ok) {
           res.json()
