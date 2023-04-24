@@ -15,7 +15,7 @@ function ProfilePage(props) {
 
   useEffect(() => {
     console.log("Getting user data...");
-    fetch(serverUrl+"/users/"+params.userId)
+    fetch(serverUrl+"/userlist/"+params.userId)
       .then(res => {
         if(res.ok) {
           res.json()

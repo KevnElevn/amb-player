@@ -17,7 +17,7 @@ function UserTable(props) {
             return (
               <tr
                 key={userInfo.id}
-                onClick={() => navigate(`/users/${userInfo.id}`)}
+                onClick={() => navigate(`/userlist/${userInfo.id}`)}
               >
                 <td>{userInfo.id}</td>
                 <td>{userInfo.username}</td>

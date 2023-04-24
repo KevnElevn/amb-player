@@ -31,7 +31,7 @@ function UserModal(props) {
           newUsername: username
         })
       };
-      fetch(serverUrl+'/users/'+props.userId, requestOptions)
+      fetch(serverUrl+'/userlist/'+props.userId, requestOptions)
         .then(res => {
           if(res.ok) {
             res.json()
